@@ -74,9 +74,8 @@ if (checkboxInputs.length === 0) {
     const WORKER_NAME_KEY = 'mosa:workerName';
     const STATE_STORAGE_KEY = `mosa:${window.location.pathname}:state:${sessionId}`;
     const WORKER_NAME_PATTERN = /^[a-zA-Z0-9][a-zA-Z0-9 .'-]*$/;
-    const CSV_EXPORTED_AT_KEY = `mosa:${window.location.pathname}:csv-exported-at:${sessionId}`;
-    const CSV_ARCHIVE_KEY = `mosa:${window.location.pathname}:csv-archive:${sessionId}`;
-    const SESSION_DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
+    const MASTER_ROWS_STORAGE_KEY = `mosa:${window.location.pathname}:master-rows`;
+    const MASTER_ROWS_UPDATED_AT_KEY = `mosa:${window.location.pathname}:master-updated-at`;
 
     const sharedConfig = window.MOSA_SHARED_CONFIG || {};
     const firebaseConfig = sharedConfig.firebase || {};
@@ -84,6 +83,8 @@ if (checkboxInputs.length === 0) {
     let workerName = (localStorage.getItem(WORKER_NAME_KEY) || '').trim();
     let activeChunk = defaultChunk;
     let dbRef = null;
+    let masterRowsRef = null;
+    let hasSeededSharedMasterRows = false;
 
     function setSyncStatus(message) {
         if (syncStatusText) {
