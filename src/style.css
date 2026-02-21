@@ -1,56 +1,91 @@
+@import url("https://fonts.googleapis.com/css2?family=Cabin:wght@400;600;700&family=Cantarell:wght@400;700&display=swap");
+
+:root {
+    --mosa-green: #646a4b;
+    --mosa-green-hover: #7c845e;
+    --mosa-cream: #f7f2e1;
+    --mosa-white: #ffffff;
+    --mosa-text: #121212;
+    --mosa-muted: #55534d;
+    --mosa-border: rgba(76, 76, 76, 0.25);
+    --mosa-shadow: 0 14px 28px rgba(0, 0, 0, 0.2);
+    --font-main: "Cabin", Georgia, serif;
+    --font-brand: "Cantarell", Arial, sans-serif;
+}
+
 * {
     box-sizing: border-box;
 }
 
 body {
     margin: 0;
-    font-family: Arial, sans-serif;
-    background: #f8fafc;
-    color: #1f2937;
+    min-height: 100vh;
+    font-family: var(--font-main);
+    background: linear-gradient(180deg, #6a7050 0%, #5d6347 100%);
+    color: var(--mosa-text);
 }
 
 .container {
-    max-width: 640px;
-    margin: 3rem auto;
-    padding: 1.5rem;
-    background: #ffffff;
-    border: 1px solid #e5e7eb;
+    width: min(92vw, 680px);
+    margin: clamp(1.5rem, 5vw, 4rem) auto;
+    padding: clamp(1.25rem, 3vw, 2.25rem);
+    background: var(--mosa-cream);
+    border: 1px solid var(--mosa-border);
     border-radius: 12px;
+    box-shadow: var(--mosa-shadow);
 }
 
-h1,
+h1 {
+    margin: 0;
+    font-family: var(--font-brand);
+    font-size: clamp(1.65rem, 4vw, 2.4rem);
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-align: center;
+}
+
 p {
+    margin: 0.9rem 0 0;
+    color: var(--mosa-muted);
+    line-height: 1.55;
     text-align: center;
 }
 
 .mode-buttons {
     display: flex;
     justify-content: center;
-    gap: 0.75rem;
-    margin: 1.5rem 0;
+    flex-wrap: wrap;
+    gap: 0.9rem;
+    margin: 1.8rem 0 0;
 }
 
-.mode-btn {
-    display: inline-block;
-    border: 1px solid #d1d5db;
-    background: #ffffff;
-    color: #111827;
-    padding: 0.6rem 1.2rem;
-    border-radius: 999px;
+.mode-btn,
+.back-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 170px;
+    padding: 0.82rem 1.35rem;
+    border: 1px solid var(--mosa-green);
+    border-radius: 0;
+    background: var(--mosa-green);
+    color: var(--mosa-white);
+    font-family: var(--font-main);
+    font-size: 0.95rem;
     font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
     text-decoration: none;
-    cursor: pointer;
+    transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
 }
 
-.mode-btn:hover {
-    background: #111827;
-    color: #ffffff;
-    border-color: #111827;
+.mode-btn:hover,
+.back-link:hover {
+    background: var(--mosa-green-hover);
+    border-color: var(--mosa-green-hover);
+    transform: translateY(-1px);
 }
 
 .back-link {
-    display: inline-block;
-    margin-top: 1rem;
-    color: #111827;
-    font-weight: 600;
+    margin-top: 0;
 }
