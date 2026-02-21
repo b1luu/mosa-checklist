@@ -37,6 +37,13 @@ body {
     box-shadow: var(--mosa-shadow);
 }
 
+.brand-logo {
+    display: block;
+    width: min(42vw, 150px);
+    height: auto;
+    margin: 0 auto 0.85rem;
+}
+
 h1 {
     margin: 0;
     font-family: var(--font-main);
