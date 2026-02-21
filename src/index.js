@@ -8,6 +8,7 @@ if (checkboxInputs.length === 0) {
     const completeChunkButton = document.querySelector('[data-chunk-action="complete-next"]');
     const chunkStatus = document.querySelector('.chunk-status');
     const workerNameInput = document.querySelector('#workerNameInput');
+    const workerNameError = document.querySelector('#workerNameError');
     const saveWorkerNameButton = document.querySelector('#saveWorkerNameButton');
     const sessionIdText = document.querySelector('#sessionIdText');
     const syncStatusText = document.querySelector('#syncStatusText');
@@ -53,6 +54,7 @@ if (checkboxInputs.length === 0) {
 
     const WORKER_NAME_KEY = 'mosa:workerName';
     const STATE_STORAGE_KEY = `mosa:${window.location.pathname}:state:${sessionId}`;
+    const WORKER_NAME_PATTERN = /^[a-zA-Z0-9][a-zA-Z0-9 .'-]*$/;
 
     const sharedConfig = window.MOSA_SHARED_CONFIG || {};
     const firebaseConfig = sharedConfig.firebase || {};
@@ -65,6 +67,38 @@ if (checkboxInputs.length === 0) {
         if (syncStatusText) {
             syncStatusText.textContent = message;
         }
+    }
+
+    function setWorkerNameError(message = '') {
+        if (workerNameInput) {
+            const hasError = Boolean(message);
+            workerNameInput.classList.toggle('is-invalid', hasError);
+            workerNameInput.setAttribute('aria-invalid', hasError ? 'true' : 'false');
+        }
+
+        if (workerNameError) {
+            workerNameError.textContent = message;
+            workerNameError.classList.toggle('is-visible', Boolean(message));
+        }
+    }
+
+    function validateWorkerName(rawValue, { showError = false } = {}) {
+        const name = rawValue.trim();
+        let message = '';
+
+        if (!name) {
+            message = 'Enter your name before checking tasks.';
+        } else if (name.length < 2) {
+            message = 'Name must be at least 2 characters.';
+        } else if (!WORKER_NAME_PATTERN.test(name)) {
+            message = 'Use letters, numbers, spaces, apostrophes, periods, or hyphens.';
+        }
+
+        if (showError) {
+            setWorkerNameError(message);
+        }
+
+        return !message;
     }
 
     function createDefaultState() {
@@ -260,6 +294,8 @@ if (checkboxInputs.length === 0) {
             workerNameInput.value = workerName;
         }
 
+        setWorkerNameError('');
+
         if (workerName) {
             localStorage.setItem(WORKER_NAME_KEY, workerName);
         } else {
@@ -270,12 +306,10 @@ if (checkboxInputs.length === 0) {
     function requireWorkerName() {
         const currentName = getWorkerName();
 
-        if (currentName) {
+        if (validateWorkerName(currentName, { showError: true })) {
             setWorkerName(currentName);
-            return currentName;
+            return currentName.trim();
         }
-
-        window.alert('Please enter your worker name first.');
 
         if (workerNameInput) {
             workerNameInput.focus();
@@ -339,11 +373,34 @@ if (checkboxInputs.length === 0) {
     function wireWorkerControls() {
         if (workerNameInput) {
             workerNameInput.value = workerName;
+            workerNameInput.addEventListener('input', () => {
+                if (workerNameInput.classList.contains('is-invalid')) {
+                    validateWorkerName(workerNameInput.value, { showError: true });
+                }
+            });
+            workerNameInput.addEventListener('blur', () => {
+                const enteredName = getWorkerName();
+
+                if (!enteredName) {
+                    setWorkerNameError('Enter your name before checking tasks.');
+                    return;
+                }
+
+                validateWorkerName(enteredName, { showError: true });
+            });
         }
 
         if (saveWorkerNameButton) {
             saveWorkerNameButton.addEventListener('click', () => {
                 const enteredName = getWorkerName();
+
+                if (!validateWorkerName(enteredName, { showError: true })) {
+                    if (workerNameInput) {
+                        workerNameInput.focus();
+                    }
+                    return;
+                }
+
                 setWorkerName(enteredName);
             });
         }

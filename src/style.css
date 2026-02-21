@@ -126,6 +126,23 @@ p {
     background: var(--mosa-white);
     color: var(--mosa-text);
     font: inherit;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
+}
+
+.sync-input:focus {
+    outline: none;
+    border-color: var(--mosa-green-hover);
+    box-shadow: 0 0 0 2px rgba(100, 106, 75, 0.18);
+}
+
+.sync-input.is-invalid {
+    border-color: #b42318;
+    background: #fff5f4;
+}
+
+.sync-input.is-invalid:focus {
+    border-color: #b42318;
+    box-shadow: 0 0 0 2px rgba(180, 35, 24, 0.18);
 }
 
 .sync-save-btn {
@@ -146,6 +163,24 @@ p {
     color: var(--mosa-muted);
     font-size: 0.9rem;
     line-height: 1.35;
+}
+
+.sync-error {
+    margin: 0.45rem 0 0;
+    text-align: left;
+    color: #b42318;
+    font-size: 0.84rem;
+    font-weight: 700;
+    line-height: 1.35;
+    min-height: 1.1rem;
+    opacity: 0;
+    transform: translateY(-2px);
+    transition: opacity 0.16s ease, transform 0.16s ease;
+}
+
+.sync-error.is-visible {
+    opacity: 1;
+    transform: translateY(0);
 }
 
 .checklist-group {
