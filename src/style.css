@@ -97,6 +97,57 @@ p {
     width: min(94vw, 860px);
 }
 
+.sync-panel {
+    margin-top: 1rem;
+    padding: 0.85rem;
+    border: 1px solid rgba(76, 76, 76, 0.2);
+    background: rgba(255, 255, 255, 0.55);
+}
+
+.sync-row {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.55rem;
+}
+
+.sync-label {
+    font-size: 0.92rem;
+    font-weight: 700;
+    color: var(--mosa-green);
+}
+
+.sync-input {
+    flex: 1 1 180px;
+    min-height: 36px;
+    padding: 0.4rem 0.55rem;
+    border: 1px solid rgba(76, 76, 76, 0.35);
+    border-radius: 0;
+    background: var(--mosa-white);
+    color: var(--mosa-text);
+    font: inherit;
+}
+
+.sync-save-btn {
+    min-height: 36px;
+    border: 1px solid var(--mosa-green);
+    background: var(--mosa-green);
+    color: var(--mosa-white);
+    font-family: var(--font-main);
+    font-size: 0.9rem;
+    font-weight: 700;
+    padding: 0.4rem 0.75rem;
+    cursor: pointer;
+}
+
+.sync-line {
+    margin: 0.5rem 0 0;
+    text-align: left;
+    color: var(--mosa-muted);
+    font-size: 0.9rem;
+    line-height: 1.35;
+}
+
 .checklist-group {
     margin-top: 1.1rem;
     padding: 0.95rem;
@@ -163,6 +214,15 @@ p {
     width: 1rem;
     height: 1rem;
     accent-color: var(--mosa-green);
+}
+
+.section-meta {
+    order: 100;
+    margin: 0.35rem 0 0;
+    text-align: left;
+    color: var(--mosa-muted);
+    font-size: 0.86rem;
+    line-height: 1.35;
 }
 
 .chunk-tabs {
