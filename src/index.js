@@ -208,8 +208,8 @@ if (checkboxInputs.length === 0) {
         return Boolean(getExportedAtTimestamp());
     }
 
-    function archiveChecklistToCsv(triggerLabel) {
-        if (isCsvAlreadyExported()) {
+    function archiveChecklistToCsv(triggerLabel, { force = false } = {}) {
+        if (isCsvAlreadyExported() && !force) {
             return;
         }
 
@@ -219,11 +219,13 @@ if (checkboxInputs.length === 0) {
 
         downloadCsv(csvContent, csvFileName);
 
-        try {
-            localStorage.setItem(CSV_ARCHIVE_KEY, csvContent);
-            localStorage.setItem(CSV_EXPORTED_AT_KEY, exportedAtIso);
-        } catch {
-            // Fallback still works because download already happened.
+        if (!isCsvAlreadyExported()) {
+            try {
+                localStorage.setItem(CSV_ARCHIVE_KEY, csvContent);
+                localStorage.setItem(CSV_EXPORTED_AT_KEY, exportedAtIso);
+            } catch {
+                // Fallback still works because download already happened.
+            }
         }
 
         setArchiveStatus(`CSV export: completed (${triggerLabel}) at ${formatCheckedAt(exportedAtIso)}`);
@@ -599,6 +601,16 @@ if (checkboxInputs.length === 0) {
         }
     }
 
+    function wireCsvControls() {
+        if (!downloadCsvButton) {
+            return;
+        }
+
+        downloadCsvButton.addEventListener('click', () => {
+            archiveChecklistToCsv('manual', { force: true });
+        });
+    }
+
     function wireCheckboxControls() {
         checkboxInputs.forEach((checkbox) => {
             checkbox.addEventListener('change', () => {
@@ -737,8 +749,10 @@ if (checkboxInputs.length === 0) {
     }
 
     wireWorkerControls();
+    wireCsvControls();
     wireCheckboxControls();
     wireChunkControls();
     applyStateToUI();
     initSharedSync();
+    scheduleCsvMidnightExport();
 }
