@@ -129,18 +129,22 @@ p {
 .check-item {
     display: flex;
     align-items: flex-start;
-    gap: 0.55rem;
+    gap: 0.35rem;
     text-align: left;
     line-height: 1.45;
     color: var(--mosa-text);
 }
 
 .check-item input[type="checkbox"] {
-    margin-top: 0.2rem;
-    width: 1rem;
-    height: 1rem;
+    display: none;
+}
+
+.check-item::before {
+    content: "\2022";
+    color: var(--mosa-green);
+    font-weight: 700;
+    line-height: 1.45;
     flex-shrink: 0;
-    accent-color: var(--mosa-green);
 }
 
 .chunk-tabs {
@@ -150,8 +154,7 @@ p {
     gap: 0.45rem;
 }
 
-.chunk-tab,
-.chunk-btn {
+.chunk-tab {
     border: 1px solid var(--mosa-green);
     background: var(--mosa-white);
     color: var(--mosa-green);
@@ -162,8 +165,7 @@ p {
     cursor: pointer;
 }
 
-.chunk-tab.is-active,
-.chunk-btn {
+.chunk-tab.is-active {
     background: var(--mosa-green);
     color: var(--mosa-white);
 }
@@ -176,22 +178,29 @@ p {
     color: var(--mosa-green);
 }
 
-.chunk-nav {
-    margin-top: 1.3rem;
-    display: flex;
-    justify-content: space-between;
-    gap: 0.7rem;
-}
-
-.chunk-btn {
-    min-width: 120px;
-}
-
-.chunk-btn:disabled {
-    opacity: 0.45;
-    cursor: not-allowed;
-}
-
 .chunk-hidden {
     display: none;
+}
+
+.chunk-action {
+    margin-top: 1.3rem;
+    display: flex;
+    justify-content: center;
+}
+
+.chunk-complete-btn {
+    border: 1px solid var(--mosa-green);
+    background: var(--mosa-green);
+    color: var(--mosa-white);
+    font-family: var(--font-main);
+    font-size: 1rem;
+    font-weight: 700;
+    padding: 0.72rem 1.1rem;
+    min-width: 230px;
+    cursor: pointer;
+}
+
+.chunk-complete-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
 }

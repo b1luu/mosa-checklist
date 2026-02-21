@@ -21,8 +21,7 @@ function saveCheckboxState() {
 
 const chunkSections = Array.from(document.querySelectorAll(".checklist-group[data-chunk]"));
 const chunkTabs = Array.from(document.querySelectorAll(".chunk-tab"));
-const prevChunkButton = document.querySelector('[data-chunk-action="prev"]');
-const nextChunkButton = document.querySelector('[data-chunk-action="next"]');
+const completeChunkButton = document.querySelector('[data-chunk-action="complete-next"]');
 const chunkStatus = document.querySelector(".chunk-status");
 const chunkNumbers = [...new Set(chunkSections.map((section) => Number(section.dataset.chunk)))].sort((a, b) => a - b);
 const chunkStorageKey = `mosa:${window.location.pathname}:activeChunk`;
@@ -47,6 +46,32 @@ function updateChunkStatus() {
     chunkStatus.textContent = `Chunk ${currentChunkIndex + 1} of ${chunkNumbers.length} - Completed ${completed}/${total}`;
 }
 
+function updateCompleteChunkButton() {
+    if (!completeChunkButton || chunkNumbers.length === 0) {
+        return;
+    }
+
+    const currentChunkIndex = chunkNumbers.indexOf(activeChunk);
+    const { completed, total } = getChunkProgress(activeChunk);
+    const isChunkDone = total > 0 && completed === total;
+    const isLastChunk = currentChunkIndex === chunkNumbers.length - 1;
+
+    if (isLastChunk && isChunkDone) {
+        completeChunkButton.textContent = "All Chunks Completed";
+        completeChunkButton.disabled = true;
+        return;
+    }
+
+    if (isChunkDone) {
+        completeChunkButton.textContent = isLastChunk ? "Finish Checklist" : "Go to Next Chunk";
+        completeChunkButton.disabled = false;
+        return;
+    }
+
+    completeChunkButton.textContent = isLastChunk ? "Complete Final Chunk" : "Complete This Chunk";
+    completeChunkButton.disabled = false;
+}
+
 function renderActiveChunk() {
     if (chunkNumbers.length === 0) {
         return;
@@ -60,17 +85,8 @@ function renderActiveChunk() {
         tab.classList.toggle("is-active", Number(tab.dataset.chunkTarget) === activeChunk);
     });
 
-    const currentChunkIndex = chunkNumbers.indexOf(activeChunk);
-
-    if (prevChunkButton) {
-        prevChunkButton.disabled = currentChunkIndex <= 0;
-    }
-
-    if (nextChunkButton) {
-        nextChunkButton.disabled = currentChunkIndex >= chunkNumbers.length - 1;
-    }
-
     updateChunkStatus();
+    updateCompleteChunkButton();
 }
 
 function setActiveChunk(nextChunk, shouldScroll = true) {
@@ -103,17 +119,31 @@ function wireChunkControls() {
         });
     });
 
-    if (prevChunkButton) {
-        prevChunkButton.addEventListener("click", () => {
-            const currentIndex = chunkNumbers.indexOf(activeChunk);
-            setActiveChunk(chunkNumbers[currentIndex - 1]);
-        });
-    }
+    if (completeChunkButton) {
+        completeChunkButton.addEventListener("click", () => {
+            const visibleChunkSections = chunkSections.filter((section) => Number(section.dataset.chunk) === activeChunk);
+            const visibleChunkCheckboxes = visibleChunkSections.flatMap((section) =>
+                Array.from(section.querySelectorAll('input[type="checkbox"][name]'))
+            );
 
-    if (nextChunkButton) {
-        nextChunkButton.addEventListener("click", () => {
+            const total = visibleChunkCheckboxes.length;
+            const completed = visibleChunkCheckboxes.filter((checkbox) => checkbox.checked).length;
+            const isChunkDone = total > 0 && completed === total;
             const currentIndex = chunkNumbers.indexOf(activeChunk);
-            setActiveChunk(chunkNumbers[currentIndex + 1]);
+            const nextChunk = chunkNumbers[currentIndex + 1];
+
+            if (!isChunkDone) {
+                visibleChunkCheckboxes.forEach((checkbox) => {
+                    checkbox.checked = true;
+                    localStorage.setItem(`${pageStoragePrefix}${checkbox.name}`, "true");
+                });
+            }
+
+            if (nextChunk) {
+                setActiveChunk(nextChunk);
+            } else {
+                renderActiveChunk();
+            }
         });
     }
 
