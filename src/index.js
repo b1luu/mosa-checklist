@@ -74,6 +74,9 @@ if (checkboxInputs.length === 0) {
     const WORKER_NAME_KEY = 'mosa:workerName';
     const STATE_STORAGE_KEY = `mosa:${window.location.pathname}:state:${sessionId}`;
     const WORKER_NAME_PATTERN = /^[a-zA-Z0-9][a-zA-Z0-9 .'-]*$/;
+    const CSV_EXPORTED_AT_KEY = `mosa:${window.location.pathname}:csv-exported-at:${sessionId}`;
+    const CSV_ARCHIVE_KEY = `mosa:${window.location.pathname}:csv-archive:${sessionId}`;
+    const SESSION_DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
 
     const sharedConfig = window.MOSA_SHARED_CONFIG || {};
     const firebaseConfig = sharedConfig.firebase || {};
@@ -86,6 +89,177 @@ if (checkboxInputs.length === 0) {
         if (syncStatusText) {
             syncStatusText.textContent = message;
         }
+    }
+
+    function setArchiveStatus(message) {
+        if (archiveStatusText) {
+            archiveStatusText.textContent = message;
+        }
+    }
+
+    function escapeCsvValue(rawValue) {
+        const value = rawValue == null ? '' : String(rawValue);
+        const escapedValue = value.replace(/"/g, '""');
+        return `"${escapedValue}"`;
+    }
+
+    function buildCsvContent(stateSnapshot, exportedAtIso) {
+        const header = [
+            'session_id',
+            'exported_at',
+            'section_key',
+            'section_title',
+            'chunk_number',
+            'chunk_label',
+            'completed',
+            'checked_by',
+            'checked_at',
+            'last_updated_by',
+            'last_updated_at'
+        ];
+
+        const rows = checkboxInputs.map((checkbox) => {
+            const itemName = checkbox.name;
+            const item = stateSnapshot.items[itemName] || {
+                checked: false,
+                checkedBy: null,
+                checkedAt: null
+            };
+            const sectionDetails = sectionDetailsByName[itemName] || {
+                sectionTitle: '',
+                chunkNumber: '',
+                chunkLabel: ''
+            };
+
+            return [
+                sessionId,
+                exportedAtIso,
+                itemName,
+                sectionDetails.sectionTitle,
+                sectionDetails.chunkNumber,
+                sectionDetails.chunkLabel,
+                item.checked ? 'TRUE' : 'FALSE',
+                item.checkedBy || '',
+                item.checkedAt || '',
+                stateSnapshot.updatedBy || '',
+                stateSnapshot.updatedAt || ''
+            ];
+        });
+
+        return [header, ...rows]
+            .map((row) => row.map((value) => escapeCsvValue(value)).join(','))
+            .join('\n');
+    }
+
+    function downloadCsv(csvContent, fileName) {
+        const csvBlob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const csvUrl = URL.createObjectURL(csvBlob);
+        const anchor = document.createElement('a');
+        anchor.href = csvUrl;
+        anchor.download = fileName;
+        document.body.appendChild(anchor);
+        anchor.click();
+        document.body.removeChild(anchor);
+        URL.revokeObjectURL(csvUrl);
+    }
+
+    function parseSessionDate(value) {
+        if (!SESSION_DATE_PATTERN.test(value)) {
+            return null;
+        }
+
+        const [year, month, day] = value.split('-').map((part) => Number(part));
+        const date = new Date(year, month - 1, day);
+
+        if (
+            Number.isNaN(date.getTime()) ||
+            date.getFullYear() !== year ||
+            date.getMonth() !== month - 1 ||
+            date.getDate() !== day
+        ) {
+            return null;
+        }
+
+        return date;
+    }
+
+    function getSessionCutoffDate() {
+        const sessionDate = parseSessionDate(sessionId);
+        if (!sessionDate) {
+            return null;
+        }
+
+        return new Date(
+            sessionDate.getFullYear(),
+            sessionDate.getMonth(),
+            sessionDate.getDate() + 1,
+            0,
+            0,
+            0,
+            0
+        );
+    }
+
+    function getExportedAtTimestamp() {
+        return localStorage.getItem(CSV_EXPORTED_AT_KEY);
+    }
+
+    function isCsvAlreadyExported() {
+        return Boolean(getExportedAtTimestamp());
+    }
+
+    function archiveChecklistToCsv(triggerLabel) {
+        if (isCsvAlreadyExported()) {
+            return;
+        }
+
+        const exportedAtIso = new Date().toISOString();
+        const csvContent = buildCsvContent(checklistState, exportedAtIso);
+        const csvFileName = `mosa-closing-${sessionId}.csv`;
+
+        downloadCsv(csvContent, csvFileName);
+
+        try {
+            localStorage.setItem(CSV_ARCHIVE_KEY, csvContent);
+            localStorage.setItem(CSV_EXPORTED_AT_KEY, exportedAtIso);
+        } catch {
+            // Fallback still works because download already happened.
+        }
+
+        setArchiveStatus(`CSV export: completed (${triggerLabel}) at ${formatCheckedAt(exportedAtIso)}`);
+    }
+
+    function scheduleCsvMidnightExport() {
+        const cutoffDate = getSessionCutoffDate();
+        if (!cutoffDate) {
+            setArchiveStatus('CSV export: invalid session id format.');
+            return;
+        }
+
+        const existingExport = getExportedAtTimestamp();
+        if (existingExport) {
+            setArchiveStatus(`CSV export: already completed at ${formatCheckedAt(existingExport)}`);
+            return;
+        }
+
+        const now = new Date();
+        if (now.getTime() >= cutoffDate.getTime()) {
+            archiveChecklistToCsv('auto');
+            return;
+        }
+
+        setArchiveStatus(`CSV export: scheduled for ${cutoffDate.toLocaleString()}`);
+        const oneMinuteMs = 60 * 1000;
+
+        window.setInterval(() => {
+            if (isCsvAlreadyExported()) {
+                return;
+            }
+
+            if (Date.now() >= cutoffDate.getTime()) {
+                archiveChecklistToCsv('auto');
+            }
+        }, oneMinuteMs);
     }
 
     function setWorkerNameError(message = '') {
