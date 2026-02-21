@@ -1,7 +1,62 @@
-h1 {
-    text-align: center;
+* {
+    box-sizing: border-box;
 }
 
 body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f8fafc;
+    color: #1f2937;
+}
+
+.container {
+    max-width: 640px;
+    margin: 3rem auto;
+    padding: 1.5rem;
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+}
+
+h1,
+h2,
+p {
     text-align: center;
+}
+
+.mode-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 0.75rem;
+    margin: 1.5rem 0;
+}
+
+.mode-btn {
+    border: 1px solid #d1d5db;
+    background: #ffffff;
+    color: #111827;
+    padding: 0.6rem 1.2rem;
+    border-radius: 999px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.mode-btn.is-active {
+    background: #111827;
+    color: #ffffff;
+    border-color: #111827;
+}
+
+.checklist-section {
+    margin-top: 1rem;
+}
+
+.check-item {
+    display: block;
+    margin: 0.75rem 0;
+    text-align: left;
+}
+
+.is-hidden {
+    display: none;
 }
