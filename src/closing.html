@@ -10,6 +10,15 @@
     <main class="container checklist-page">
         <h1>Closing Checklist</h1>
         <p>Complete every task before locking up.</p>
+        <section class="sync-panel" aria-label="Shared checklist controls">
+            <div class="sync-row">
+                <label class="sync-label" for="workerNameInput">Worker name</label>
+                <input id="workerNameInput" class="sync-input" type="text" maxlength="40" placeholder="Enter your name">
+                <button id="saveWorkerNameButton" class="sync-save-btn" type="button">Save</button>
+            </div>
+            <p class="sync-line">Session: <strong id="sessionIdText"></strong></p>
+            <p class="sync-line" id="syncStatusText">Mode: Local only</p>
+        </section>
         <nav class="chunk-tabs" aria-label="Closing checklist chunks">
             <button type="button" class="chunk-tab is-active" data-chunk-target="1">Front Bar + Front Seating</button>
             <button type="button" class="chunk-tab" data-chunk-target="2">Back Kitchen + Inventory</button>
@@ -196,6 +205,9 @@
             <a class="back-link" href="index.html">Back to Home</a>
         </div>
     </main>
+    <script src="shared-config.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-database-compat.js"></script>
     <script src="index.js"></script>
 </body>
 </html>
