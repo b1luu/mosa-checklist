@@ -15,6 +15,7 @@ function saveCheckboxState() {
         checkbox.addEventListener("change", () => {
             localStorage.setItem(`${pageStoragePrefix}${checkbox.name}`, String(checkbox.checked));
             updateChunkStatus();
+            updateCompleteChunkButton();
         });
     });
 }

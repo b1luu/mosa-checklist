@@ -112,6 +112,29 @@ p {
     color: var(--mosa-green);
 }
 
+.section-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.9rem;
+}
+
+.section-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.92rem;
+    font-weight: 700;
+    color: var(--mosa-green);
+    white-space: nowrap;
+}
+
+.section-toggle input[type="checkbox"] {
+    width: 1rem;
+    height: 1rem;
+    accent-color: var(--mosa-green);
+}
+
 .check-note {
     margin: 0.6rem 0 0;
     text-align: left;
@@ -122,6 +145,9 @@ p {
 
 .checklist-list {
     margin-top: 0.6rem;
+    margin-bottom: 0;
+    padding-left: 0;
+    list-style: none;
     display: grid;
     gap: 0.5rem;
 }
@@ -133,10 +159,6 @@ p {
     text-align: left;
     line-height: 1.45;
     color: var(--mosa-text);
-}
-
-.check-item input[type="checkbox"] {
-    display: none;
 }
 
 .check-item::before {
