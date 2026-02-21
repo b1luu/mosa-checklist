@@ -9,6 +9,8 @@ if (checkboxInputs.length === 0) {
     const chunkStatus = document.querySelector('.chunk-status');
     const workerNameInput = document.querySelector('#workerNameInput');
     const workerNameError = document.querySelector('#workerNameError');
+    const downloadCsvButton = document.querySelector('#downloadCsvButton');
+    const archiveStatusText = document.querySelector('#archiveStatusText');
     const saveWorkerNameButton = document.querySelector('#saveWorkerNameButton');
     const sessionIdText = document.querySelector('#sessionIdText');
     const syncStatusText = document.querySelector('#syncStatusText');
@@ -17,10 +19,22 @@ if (checkboxInputs.length === 0) {
     const defaultChunk = chunkNumbers[0] || 1;
     const chunkItemNamesByChunk = {};
     const sectionMetaByName = {};
+    const sectionDetailsByName = {};
+    const chunkLabelByNumber = {};
+
+    chunkTabs.forEach((tab) => {
+        const chunkNumber = Number(tab.dataset.chunkTarget);
+        const chunkLabel = tab.textContent.trim();
+        if (chunkNumber) {
+            chunkLabelByNumber[chunkNumber] = chunkLabel;
+        }
+    });
 
     chunkSections.forEach((section) => {
         const chunkNumber = Number(section.dataset.chunk);
         const checkbox = section.querySelector('input[type="checkbox"][name]');
+        const sectionHeading = section.querySelector('h2');
+        const sectionTitle = sectionHeading ? sectionHeading.textContent.trim() : checkbox ? checkbox.name : '';
 
         if (!checkbox) {
             return;
@@ -31,6 +45,11 @@ if (checkboxInputs.length === 0) {
         }
 
         chunkItemNamesByChunk[chunkNumber].push(checkbox.name);
+        sectionDetailsByName[checkbox.name] = {
+            sectionTitle,
+            chunkNumber,
+            chunkLabel: chunkLabelByNumber[chunkNumber] || ''
+        };
 
         const sectionLabel = checkbox.closest('.section-complete');
         if (sectionLabel) {

@@ -157,6 +157,22 @@ p {
     cursor: pointer;
 }
 
+.sync-export-btn {
+    min-height: 34px;
+    border: 1px solid rgba(76, 76, 76, 0.35);
+    background: rgba(255, 255, 255, 0.75);
+    color: var(--mosa-text);
+    font-family: var(--font-main);
+    font-size: 0.86rem;
+    font-weight: 700;
+    padding: 0.35rem 0.65rem;
+    cursor: pointer;
+}
+
+.sync-export-btn:hover {
+    background: rgba(255, 255, 255, 0.95);
+}
+
 .sync-line {
     margin: 0.5rem 0 0;
     text-align: left;
