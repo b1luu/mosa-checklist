@@ -104,54 +104,6 @@ if (checkboxInputs.length === 0) {
         return `"${escapedValue}"`;
     }
 
-    function buildCsvContent(stateSnapshot, exportedAtIso) {
-        const header = [
-            'session_id',
-            'exported_at',
-            'section_key',
-            'section_title',
-            'chunk_number',
-            'chunk_label',
-            'completed',
-            'checked_by',
-            'checked_at',
-            'last_updated_by',
-            'last_updated_at'
-        ];
-
-        const rows = checkboxInputs.map((checkbox) => {
-            const itemName = checkbox.name;
-            const item = stateSnapshot.items[itemName] || {
-                checked: false,
-                checkedBy: null,
-                checkedAt: null
-            };
-            const sectionDetails = sectionDetailsByName[itemName] || {
-                sectionTitle: '',
-                chunkNumber: '',
-                chunkLabel: ''
-            };
-
-            return [
-                sessionId,
-                exportedAtIso,
-                itemName,
-                sectionDetails.sectionTitle,
-                sectionDetails.chunkNumber,
-                sectionDetails.chunkLabel,
-                item.checked ? 'TRUE' : 'FALSE',
-                item.checkedBy || '',
-                item.checkedAt || '',
-                stateSnapshot.updatedBy || '',
-                stateSnapshot.updatedAt || ''
-            ];
-        });
-
-        return [header, ...rows]
-            .map((row) => row.map((value) => escapeCsvValue(value)).join(','))
-            .join('\n');
-    }
-
     function downloadCsv(csvContent, fileName) {
         const csvBlob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
         const csvUrl = URL.createObjectURL(csvBlob);
@@ -164,105 +116,192 @@ if (checkboxInputs.length === 0) {
         URL.revokeObjectURL(csvUrl);
     }
 
-    function parseSessionDate(value) {
-        if (!SESSION_DATE_PATTERN.test(value)) {
-            return null;
+    function loadLocalMasterRows() {
+        const raw = localStorage.getItem(MASTER_ROWS_STORAGE_KEY);
+        if (!raw) {
+            return {};
         }
 
-        const [year, month, day] = value.split('-').map((part) => Number(part));
-        const date = new Date(year, month - 1, day);
+        try {
+            const parsed = JSON.parse(raw);
+            if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+                return {};
+            }
 
-        if (
-            Number.isNaN(date.getTime()) ||
-            date.getFullYear() !== year ||
-            date.getMonth() !== month - 1 ||
-            date.getDate() !== day
-        ) {
-            return null;
+            return parsed;
+        } catch {
+            return {};
+        }
+    }
+
+    function saveLocalMasterRows(masterRows) {
+        localStorage.setItem(MASTER_ROWS_STORAGE_KEY, JSON.stringify(masterRows));
+    }
+
+    function createMasterRow(itemName) {
+        const item = checklistState.items[itemName] || {
+            checked: false,
+            checkedBy: null,
+            checkedAt: null
+        };
+        const sectionDetails = sectionDetailsByName[itemName] || {
+            sectionTitle: '',
+            chunkNumber: '',
+            chunkLabel: ''
+        };
+
+        return {
+            sessionId,
+            sectionKey: itemName,
+            sectionTitle: sectionDetails.sectionTitle,
+            chunkNumber: sectionDetails.chunkNumber,
+            chunkLabel: sectionDetails.chunkLabel,
+            completed: Boolean(item.checked),
+            checkedBy: item.checkedBy || '',
+            checkedAt: item.checkedAt || '',
+            lastUpdatedBy: checklistState.updatedBy || '',
+            lastUpdatedAt: checklistState.updatedAt || ''
+        };
+    }
+
+    function upsertLocalMasterRows(itemNames = []) {
+        if (itemNames.length === 0) {
+            return;
         }
 
-        return date;
+        const masterRows = loadLocalMasterRows();
+        const sessionRows = masterRows[sessionId] && typeof masterRows[sessionId] === 'object'
+            ? masterRows[sessionId]
+            : {};
+
+        itemNames.forEach((itemName) => {
+            sessionRows[itemName] = createMasterRow(itemName);
+        });
+
+        masterRows[sessionId] = sessionRows;
+        saveLocalMasterRows(masterRows);
+
+        const updatedAtIso = new Date().toISOString();
+        localStorage.setItem(MASTER_ROWS_UPDATED_AT_KEY, updatedAtIso);
+        setArchiveStatus(`Master CSV: updated at ${formatCheckedAt(updatedAtIso)}`);
     }
 
-    function getSessionCutoffDate() {
-        const sessionDate = parseSessionDate(sessionId);
-        if (!sessionDate) {
-            return null;
+    function pushSharedMasterRows(itemNames = []) {
+        if (!masterRowsRef || itemNames.length === 0) {
+            return;
         }
 
-        return new Date(
-            sessionDate.getFullYear(),
-            sessionDate.getMonth(),
-            sessionDate.getDate() + 1,
-            0,
-            0,
-            0,
-            0
-        );
+        const updates = {};
+        itemNames.forEach((itemName) => {
+            updates[`${sessionId}/${itemName}`] = createMasterRow(itemName);
+        });
+
+        masterRowsRef.update(updates).catch(() => {
+            setArchiveStatus('Master CSV: shared sync failed, local rows still updated');
+        });
     }
 
-    function getExportedAtTimestamp() {
-        return localStorage.getItem(CSV_EXPORTED_AT_KEY);
+    function syncMasterRows(itemNames = [], { includeShared = true } = {}) {
+        if (itemNames.length === 0) {
+            return;
+        }
+
+        upsertLocalMasterRows(itemNames);
+
+        if (includeShared) {
+            pushSharedMasterRows(itemNames);
+        }
     }
 
-    function isCsvAlreadyExported() {
-        return Boolean(getExportedAtTimestamp());
+    function normalizeMasterRows(rawRows) {
+        if (!rawRows || typeof rawRows !== 'object' || Array.isArray(rawRows)) {
+            return {};
+        }
+
+        return rawRows;
     }
 
-    function archiveChecklistToCsv(triggerLabel, { force = false } = {}) {
-        if (isCsvAlreadyExported() && !force) {
+    function buildMasterCsvContent(masterRowsSnapshot, exportedAtIso) {
+        const header = [
+            'exported_at',
+            'session_id',
+            'section_key',
+            'section_title',
+            'chunk_number',
+            'chunk_label',
+            'completed',
+            'checked_by',
+            'checked_at',
+            'last_updated_by',
+            'last_updated_at'
+        ];
+
+        const sessionIds = Object.keys(masterRowsSnapshot).sort();
+        const rows = [];
+
+        sessionIds.forEach((rowSessionId) => {
+            const sessionRows = masterRowsSnapshot[rowSessionId];
+            if (!sessionRows || typeof sessionRows !== 'object' || Array.isArray(sessionRows)) {
+                return;
+            }
+
+            Object.keys(sessionRows)
+                .sort()
+                .forEach((itemName) => {
+                    const row = sessionRows[itemName] || {};
+                    rows.push([
+                        exportedAtIso,
+                        row.sessionId || rowSessionId,
+                        row.sectionKey || itemName,
+                        row.sectionTitle || '',
+                        row.chunkNumber || '',
+                        row.chunkLabel || '',
+                        row.completed ? 'TRUE' : 'FALSE',
+                        row.checkedBy || '',
+                        row.checkedAt || '',
+                        row.lastUpdatedBy || '',
+                        row.lastUpdatedAt || ''
+                    ]);
+                });
+        });
+
+        return [header, ...rows]
+            .map((row) => row.map((value) => escapeCsvValue(value)).join(','))
+            .join('\n');
+    }
+
+    function downloadMasterCsvFromRows(masterRowsSnapshot, sourceLabel) {
+        const rowsBySession = normalizeMasterRows(masterRowsSnapshot);
+        if (Object.keys(rowsBySession).length === 0) {
+            setArchiveStatus('Master CSV: no rows yet');
             return;
         }
 
         const exportedAtIso = new Date().toISOString();
-        const csvContent = buildCsvContent(checklistState, exportedAtIso);
-        const csvFileName = `mosa-closing-${sessionId}.csv`;
-
-        downloadCsv(csvContent, csvFileName);
-
-        if (!isCsvAlreadyExported()) {
-            try {
-                localStorage.setItem(CSV_ARCHIVE_KEY, csvContent);
-                localStorage.setItem(CSV_EXPORTED_AT_KEY, exportedAtIso);
-            } catch {
-                // Fallback still works because download already happened.
-            }
-        }
-
-        setArchiveStatus(`CSV export: completed (${triggerLabel}) at ${formatCheckedAt(exportedAtIso)}`);
+        const csvContent = buildMasterCsvContent(rowsBySession, exportedAtIso);
+        downloadCsv(csvContent, 'mosa-closing-master.csv');
+        setArchiveStatus(`Master CSV: downloaded (${sourceLabel}) at ${formatCheckedAt(exportedAtIso)}`);
     }
 
-    function scheduleCsvMidnightExport() {
-        const cutoffDate = getSessionCutoffDate();
-        if (!cutoffDate) {
-            setArchiveStatus('CSV export: invalid session id format.');
+    function downloadMasterCsvNow() {
+        if (masterRowsRef) {
+            masterRowsRef.once('value')
+                .then((snapshot) => {
+                    const sharedRows = normalizeMasterRows(snapshot.val());
+                    if (Object.keys(sharedRows).length > 0) {
+                        downloadMasterCsvFromRows(sharedRows, 'shared');
+                        return;
+                    }
+
+                    downloadMasterCsvFromRows(loadLocalMasterRows(), 'local');
+                })
+                .catch(() => {
+                    downloadMasterCsvFromRows(loadLocalMasterRows(), 'local fallback');
+                });
             return;
         }
 
-        const existingExport = getExportedAtTimestamp();
-        if (existingExport) {
-            setArchiveStatus(`CSV export: already completed at ${formatCheckedAt(existingExport)}`);
-            return;
-        }
-
-        const now = new Date();
-        if (now.getTime() >= cutoffDate.getTime()) {
-            archiveChecklistToCsv('auto');
-            return;
-        }
-
-        setArchiveStatus(`CSV export: scheduled for ${cutoffDate.toLocaleString()}`);
-        const oneMinuteMs = 60 * 1000;
-
-        window.setInterval(() => {
-            if (isCsvAlreadyExported()) {
-                return;
-            }
-
-            if (Date.now() >= cutoffDate.getTime()) {
-                archiveChecklistToCsv('auto');
-            }
-        }, oneMinuteMs);
+        downloadMasterCsvFromRows(loadLocalMasterRows(), 'local');
     }
 
     function setWorkerNameError(message = '') {
@@ -524,6 +563,7 @@ if (checkboxInputs.length === 0) {
         checklistState.updatedBy = getWorkerName() || null;
 
         saveLocalState();
+        syncMasterRows(changedItemNames);
 
         if (!dbRef) {
             return;
@@ -608,7 +648,7 @@ if (checkboxInputs.length === 0) {
         }
 
         downloadCsvButton.addEventListener('click', () => {
-            archiveChecklistToCsv('manual', { force: true });
+            downloadMasterCsvNow();
         });
     }
 
@@ -719,6 +759,7 @@ if (checkboxInputs.length === 0) {
 
             const db = firebaseApp.database();
             dbRef = db.ref(`checklists/closing/${sessionId}`);
+            masterRowsRef = db.ref('reports/closing/masterRows');
             setSyncStatus('Mode: Connecting to shared session...');
 
             dbRef.on('value', (snapshot) => {
@@ -729,6 +770,10 @@ if (checkboxInputs.length === 0) {
                     checklistState.updatedBy = getWorkerName() || null;
                     checklistState.activeChunk = activeChunk;
                     dbRef.set(checklistState);
+                    if (!hasSeededSharedMasterRows) {
+                        syncMasterRows(checkboxInputs.map((checkbox) => checkbox.name), { includeShared: true });
+                        hasSeededSharedMasterRows = true;
+                    }
                     setSyncStatus('Mode: Shared live');
                     return;
                 }
@@ -736,6 +781,11 @@ if (checkboxInputs.length === 0) {
                 checklistState = normalizeState(remoteValue);
                 saveLocalState();
                 applyStateToUI();
+                syncMasterRows(checkboxInputs.map((checkbox) => checkbox.name), { includeShared: false });
+                if (!hasSeededSharedMasterRows) {
+                    pushSharedMasterRows(checkboxInputs.map((checkbox) => checkbox.name));
+                    hasSeededSharedMasterRows = true;
+                }
                 setSyncStatus('Mode: Shared live');
             }, () => {
                 setSyncStatus('Mode: Shared sync error. Using local cache.');
@@ -754,6 +804,6 @@ if (checkboxInputs.length === 0) {
     wireCheckboxControls();
     wireChunkControls();
     applyStateToUI();
+    syncMasterRows(checkboxInputs.map((checkbox) => checkbox.name), { includeShared: false });
     initSharedSync();
-    scheduleCsvMidnightExport();
 }

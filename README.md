@@ -32,24 +32,24 @@ How it works:
 
 If shared mode is not configured, app runs in local-only mode automatically.
 
-## Daily CSV Archive
-Closing data can now be archived to CSV by session date.
+## Master CSV (Continuously Updated)
+Closing data can be kept in one continuously updated master dataset.
 
 How it works:
-- Session date comes from URL, example: `closing.html?session=2026-02-21`
-- App schedules an export at local midnight of the next day:
-  - For `2026-02-21`, export triggers at `2026-02-22 12:00 AM` local time
-- CSV includes:
-  - section key/title
-  - chunk info
-  - completion status
-  - checked by / checked at
-  - last updated by / last updated at
-- A backup button is available on closing page: `Download CSV Now`
+- On every checklist change, section rows are updated in:
+  - local cache (`localStorage`)
+  - Firebase Realtime Database (when shared mode is enabled)
+- Master rows are stored by session id + section key.
+- `Download Master CSV` exports one combined CSV across all saved sessions.
 
-Important limitation:
-- This is browser-driven export. At least one device with the page open must still be active when midnight passes.
-- For guaranteed unattended exports (even when no one is on the page), use a backend scheduled job (for example Firebase Cloud Functions + Storage).
+CSV columns:
+- exported_at
+- session_id
+- section_key / section_title
+- chunk_number / chunk_label
+- completed
+- checked_by / checked_at
+- last_updated_by / last_updated_at
 
 ## Enable Shared Mode
 1. Create a Firebase project with Realtime Database enabled.
@@ -79,5 +79,5 @@ Then open: `http://localhost:5500`
 - `src/opening.html` - opening page (placeholder)
 - `src/closing.html` - closing checklist UI
 - `src/style.css` - global styles and checklist styles
-- `src/index.js` - checklist logic, chunk controls, checked-by metadata, local + shared sync, CSV export scheduling
+- `src/index.js` - checklist logic, chunk controls, checked-by metadata, local + shared sync, master CSV updates/export
 - `src/shared-config.js` - shared sync configuration (disabled by default)
