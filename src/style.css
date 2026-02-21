@@ -93,3 +93,52 @@ p {
 .back-link {
     margin-top: 0;
 }
+
+.checklist-page {
+    width: min(94vw, 860px);
+}
+
+.checklist-group {
+    margin-top: 1.1rem;
+    padding: 0.95rem;
+    border: 1px solid rgba(76, 76, 76, 0.2);
+    background: rgba(255, 255, 255, 0.35);
+}
+
+.checklist-group h2 {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--mosa-green);
+}
+
+.check-note {
+    margin: 0.6rem 0 0;
+    text-align: left;
+    font-size: 0.97rem;
+    font-weight: 600;
+    color: var(--mosa-text);
+}
+
+.checklist-list {
+    margin-top: 0.6rem;
+    display: grid;
+    gap: 0.5rem;
+}
+
+.check-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.55rem;
+    text-align: left;
+    line-height: 1.45;
+    color: var(--mosa-text);
+}
+
+.check-item input[type="checkbox"] {
+    margin-top: 0.2rem;
+    width: 1rem;
+    height: 1rem;
+    flex-shrink: 0;
+    accent-color: var(--mosa-green);
+}
