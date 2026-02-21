@@ -19,7 +19,6 @@ body {
 }
 
 h1,
-h2,
 p {
     text-align: center;
 }
@@ -32,31 +31,26 @@ p {
 }
 
 .mode-btn {
+    display: inline-block;
     border: 1px solid #d1d5db;
     background: #ffffff;
     color: #111827;
     padding: 0.6rem 1.2rem;
     border-radius: 999px;
     font-weight: 600;
+    text-decoration: none;
     cursor: pointer;
 }
 
-.mode-btn.is-active {
+.mode-btn:hover {
     background: #111827;
     color: #ffffff;
     border-color: #111827;
 }
 
-.checklist-section {
+.back-link {
+    display: inline-block;
     margin-top: 1rem;
-}
-
-.check-item {
-    display: block;
-    margin: 0.75rem 0;
-    text-align: left;
-}
-
-.is-hidden {
-    display: none;
+    color: #111827;
+    font-weight: 600;
 }

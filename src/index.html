@@ -9,33 +9,12 @@
 <body>
     <main class="container">
         <h1>Mosa Tea Checklist</h1>
-        <p>Virtual Opening and Closing Checklist by Brandon Luu</p>
+        <p>Select one to continue.</p>
 
-        <div class="mode-buttons" role="tablist" aria-label="Checklist selector">
-            <button type="button" class="mode-btn is-active" data-target="openingChecklist">Opening</button>
-            <button type="button" class="mode-btn" data-target="closingChecklist">Closing</button>
+        <div class="mode-buttons">
+            <a class="mode-btn" href="opening.html">Opening</a>
+            <a class="mode-btn" href="closing.html">Closing</a>
         </div>
-
-        <section id="openingChecklist" class="checklist-section">
-            <h2>Opening Checklist</h2>
-            <label class="check-item">
-                <input type="checkbox" name="open_square_pos_stock" />
-                Mark sold out items back in stock on Square POS
-            </label>
-            <label class="check-item">
-                <input type="checkbox" name="open_sealer" />
-                Turn on Boba Sealer Machine
-            </label>
-        </section>
-
-        <section id="closingChecklist" class="checklist-section is-hidden">
-            <h2>Closing Checklist</h2>
-            <label class="check-item">
-                <input type="checkbox" name="close_mop" />
-                Mop front and back
-            </label>
-        </section>
     </main>
-    <script src="index.js"></script>
 </body>
 </html>
