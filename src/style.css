@@ -10,7 +10,6 @@
     --mosa-border: rgba(76, 76, 76, 0.25);
     --mosa-shadow: 0 14px 28px rgba(0, 0, 0, 0.2);
     --font-main: "Cabin", Georgia, serif;
-    --font-logo: "Cantarell", Arial, sans-serif;
 }
 
 * {
@@ -35,13 +34,6 @@ body {
     border: 1px solid var(--mosa-border);
     border-radius: 12px;
     box-shadow: var(--mosa-shadow);
-}
-
-.brand-logo {
-    display: block;
-    width: min(42vw, 150px);
-    height: auto;
-    margin: 0 auto 0.85rem;
 }
 
 h1 {
