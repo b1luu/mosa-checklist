@@ -10,8 +10,15 @@
     <main class="container checklist-page">
         <h1>Closing Checklist</h1>
         <p>Complete every task before locking up.</p>
+        <nav class="chunk-tabs" aria-label="Closing checklist chunks">
+            <button type="button" class="chunk-tab is-active" data-chunk-target="1">Front + Inventory</button>
+            <button type="button" class="chunk-tab" data-chunk-target="2">Storage + Kitchen</button>
+            <button type="button" class="chunk-tab" data-chunk-target="3">Floor + Trash</button>
+            <button type="button" class="chunk-tab" data-chunk-target="4">Final + Security</button>
+        </nav>
+        <p class="chunk-status" aria-live="polite"></p>
 
-        <section class="checklist-group">
+        <section class="checklist-group" data-chunk="1">
             <h2>General / Front Tasks</h2>
             <div class="checklist-list">
                 <label class="check-item"><input type="checkbox" name="close_menu_stands">Bring in menu stands</label>
@@ -20,7 +27,7 @@
             </div>
         </section>
 
-        <section class="checklist-group">
+        <section class="checklist-group" data-chunk="1">
             <h2>Equipment Cleaning</h2>
             <p class="check-note">Wash all equipment, including:</p>
             <div class="checklist-list">
@@ -34,7 +41,7 @@
             </div>
         </section>
 
-        <section class="checklist-group">
+        <section class="checklist-group" data-chunk="1">
             <h2>Inventory Check (AT LEAST)</h2>
             <div class="checklist-list">
                 <label class="check-item"><input type="checkbox" name="close_genmai_dispenser">1 dispenser of Genmai (2 for Fri/Sat)</label>
@@ -47,7 +54,7 @@
             </div>
         </section>
 
-        <section class="checklist-group">
+        <section class="checklist-group" data-chunk="2">
             <h2>Devices and POS</h2>
             <div class="checklist-list">
                 <label class="check-item"><input type="checkbox" name="close_charge_tablets">Charge tablets if needed (DoorDash and HP) and put back</label>
@@ -56,7 +63,7 @@
             </div>
         </section>
 
-        <section class="checklist-group">
+        <section class="checklist-group" data-chunk="2">
             <h2>Ingredient Storage</h2>
             <div class="checklist-list">
                 <label class="check-item"><input type="checkbox" name="close_food_to_fridge">Move all food ingredients to fridge</label>
@@ -70,7 +77,7 @@
             </div>
         </section>
 
-        <section class="checklist-group">
+        <section class="checklist-group" data-chunk="2">
             <h2>Kitchen Cleaning</h2>
             <div class="checklist-list">
                 <label class="check-item"><input type="checkbox" name="close_sealer_cleanup">Clean the sealer, turn it off, cut off used portion</label>
@@ -89,7 +96,7 @@
             </div>
         </section>
 
-        <section class="checklist-group">
+        <section class="checklist-group" data-chunk="3">
             <h2>Mop / Vacuum Machine</h2>
             <div class="checklist-list">
                 <label class="check-item"><input type="checkbox" name="close_dirty_tank">Empty and wash dirty tank</label>
@@ -98,7 +105,7 @@
             </div>
         </section>
 
-        <section class="checklist-group">
+        <section class="checklist-group" data-chunk="3">
             <h2>Restroom and Supplies</h2>
             <div class="checklist-list">
                 <label class="check-item"><input type="checkbox" name="close_refill_towels_soap">Refill hand towel paper and hand soaps if below 1/2</label>
@@ -108,7 +115,7 @@
             </div>
         </section>
 
-        <section class="checklist-group">
+        <section class="checklist-group" data-chunk="3">
             <h2>Floor Cleaning</h2>
             <div class="checklist-list">
                 <label class="check-item"><input type="checkbox" name="close_floor_bar">Sweep and mop bar area</label>
@@ -118,7 +125,7 @@
             </div>
         </section>
 
-        <section class="checklist-group">
+        <section class="checklist-group" data-chunk="3">
             <h2>Trash and Disposal</h2>
             <div class="checklist-list">
                 <label class="check-item"><input type="checkbox" name="close_all_trash">Throw all trash (including breaking down empty boxes)</label>
@@ -133,7 +140,7 @@
             </div>
         </section>
 
-        <section class="checklist-group">
+        <section class="checklist-group" data-chunk="4">
             <h2>Final Cleaning Tasks</h2>
             <div class="checklist-list">
                 <label class="check-item"><input type="checkbox" name="close_boba_sink_simple_green">Clean boba washing sink strain (hot water + Simple Green)</label>
@@ -143,7 +150,7 @@
             </div>
         </section>
 
-        <section class="checklist-group">
+        <section class="checklist-group" data-chunk="4">
             <h2>Machine Shutdown</h2>
             <p class="check-note">Turn off machines:</p>
             <div class="checklist-list">
@@ -153,7 +160,7 @@
             </div>
         </section>
 
-        <section class="checklist-group">
+        <section class="checklist-group" data-chunk="4">
             <h2>Store Closing Security</h2>
             <div class="checklist-list">
                 <label class="check-item"><input type="checkbox" name="close_lights_fan_ac">Turn off all lights, fan, and AC</label>
@@ -163,9 +170,15 @@
             </div>
         </section>
 
+        <div class="chunk-nav">
+            <button type="button" class="chunk-btn" data-chunk-action="prev">Back</button>
+            <button type="button" class="chunk-btn" data-chunk-action="next">Next</button>
+        </div>
+
         <div class="mode-buttons">
             <a class="back-link" href="index.html">Back to Home</a>
         </div>
     </main>
+    <script src="index.js"></script>
 </body>
 </html>

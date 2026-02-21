@@ -142,3 +142,56 @@ p {
     flex-shrink: 0;
     accent-color: var(--mosa-green);
 }
+
+.chunk-tabs {
+    margin-top: 1rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 0.45rem;
+}
+
+.chunk-tab,
+.chunk-btn {
+    border: 1px solid var(--mosa-green);
+    background: var(--mosa-white);
+    color: var(--mosa-green);
+    font-family: var(--font-main);
+    font-size: 0.92rem;
+    font-weight: 600;
+    padding: 0.58rem 0.72rem;
+    cursor: pointer;
+}
+
+.chunk-tab.is-active,
+.chunk-btn {
+    background: var(--mosa-green);
+    color: var(--mosa-white);
+}
+
+.chunk-status {
+    margin-top: 0.65rem;
+    text-align: left;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--mosa-green);
+}
+
+.chunk-nav {
+    margin-top: 1.3rem;
+    display: flex;
+    justify-content: space-between;
+    gap: 0.7rem;
+}
+
+.chunk-btn {
+    min-width: 120px;
+}
+
+.chunk-btn:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+.chunk-hidden {
+    display: none;
+}
