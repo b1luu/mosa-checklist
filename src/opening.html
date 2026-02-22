@@ -25,13 +25,19 @@
             <p class="sync-line" id="syncStatusText">Mode: Local only</p>
         </section>
 
-        <section class="checklist-group">
+        <nav class="chunk-tabs" aria-label="Opening checklist role tabs">
+            <button type="button" class="chunk-tab is-active" data-chunk-target="1">Front Opening</button>
+            <button type="button" class="chunk-tab" data-chunk-target="2">Back Opening</button>
+        </nav>
+        <p class="chunk-status" aria-live="polite"></p>
+
+        <section class="checklist-group" data-chunk="1">
             <h2>Lights</h2>
             <ul class="task-list">
                 <li class="task-item">
                     <label>
                         <input type="checkbox" name="open_lights_all">
-                        Turn on all lights (see details)
+                        TURN ON ALL LIGHTS
                     </label>
                     <ul class="task-sublist">
                         <li class="task-item">
@@ -57,7 +63,7 @@
             </ul>
         </section>
 
-        <section class="checklist-group">
+        <section class="checklist-group" data-chunk="2">
             <h2>Machines &amp; Equipment</h2>
             <ul class="task-list">
                 <li class="task-item">
@@ -93,7 +99,7 @@
             </ul>
         </section>
 
-        <section class="checklist-group">
+        <section class="checklist-group" data-chunk="1">
             <h2>Systems &amp; Front</h2>
             <ul class="task-list">
                 <li class="task-item">
@@ -117,7 +123,7 @@
             </ul>
         </section>
 
-        <section class="checklist-group">
+        <section class="checklist-group" data-chunk="1">
             <h2>Supplies &amp; Cleanliness</h2>
             <ul class="task-list">
                 <li class="task-item">
@@ -167,7 +173,7 @@
             </ul>
         </section>
 
-        <section class="checklist-group">
+        <section class="checklist-group" data-chunk="2">
             <h2>Product Quality</h2>
             <ul class="task-list">
                 <li class="task-item">
@@ -191,7 +197,7 @@
             </ul>
         </section>
 
-        <section class="checklist-group">
+        <section class="checklist-group" data-chunk="2">
             <h2>Daily Prep</h2>
             <ul class="task-list">
                 <li class="task-item">
@@ -202,6 +208,10 @@
                 </li>
             </ul>
         </section>
+
+        <div class="chunk-action">
+            <button type="button" class="chunk-complete-btn" data-chunk-action="complete-next">Complete This Chunk</button>
+        </div>
 
         <div class="mode-buttons">
             <a class="back-link" href="index.html">Back to Home</a>

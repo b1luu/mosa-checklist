@@ -43,11 +43,12 @@ if (checkboxInputs.length === 0) {
 
     chunkSections.forEach((section) => {
         const chunkNumber = Number(section.dataset.chunk);
-        const checkbox = section.querySelector('input[type="checkbox"][name]');
+        const sectionCheckboxes = Array.from(section.querySelectorAll('input[type="checkbox"][name]'));
         const sectionHeading = section.querySelector('h2');
-        const sectionTitle = sectionHeading ? sectionHeading.textContent.trim() : checkbox ? checkbox.name : '';
+        const sectionTitle = sectionHeading ? sectionHeading.textContent.trim() : '';
+        const hasSectionComplete = Boolean(section.querySelector('.section-complete input[type="checkbox"][name]'));
 
-        if (!checkbox) {
+        if (sectionCheckboxes.length === 0) {
             return;
         }
 
@@ -55,12 +56,16 @@ if (checkboxInputs.length === 0) {
             chunkItemNamesByChunk[chunkNumber] = [];
         }
 
-        chunkItemNamesByChunk[chunkNumber].push(checkbox.name);
-        sectionDetailsByName[checkbox.name] = {
-            sectionTitle,
-            chunkNumber,
-            chunkLabel: chunkLabelByNumber[chunkNumber] || ''
-        };
+        sectionCheckboxes.forEach((checkbox) => {
+            const itemTitle = hasSectionComplete ? sectionTitle : getCheckboxLabelText(checkbox);
+
+            chunkItemNamesByChunk[chunkNumber].push(checkbox.name);
+            sectionDetailsByName[checkbox.name] = {
+                sectionTitle: itemTitle,
+                chunkNumber,
+                chunkLabel: chunkLabelByNumber[chunkNumber] || sectionTitle
+            };
+        });
     });
 
     checkboxInputs.forEach((checkbox) => {
