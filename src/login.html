@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mosa Tea Login</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <main class="container">
+        <h1>Mosa Tea Access</h1>
+        <p>Enter your 4-digit clock-in PIN.</p>
+
+        <form id="pinLoginForm" class="auth-form" novalidate>
+            <label class="sync-label" for="pinInput">PIN</label>
+            <input
+                id="pinInput"
+                class="sync-input auth-pin-input"
+                type="password"
+                inputmode="numeric"
+                pattern="[0-9]*"
+                maxlength="4"
+                autocomplete="one-time-code"
+                placeholder="4-digit PIN"
+                required
+            >
+            <button type="submit" class="sync-save-btn auth-submit-btn">Enter</button>
+            <p id="pinError" class="sync-error" role="alert" aria-live="polite"></p>
+        </form>
+    </main>
+    <script src="shared-config.js"></script>
+    <script src="auth.js"></script>
+    <script>
+        window.MosaPinAuth.initLoginPage();
+    </script>
+</body>
+</html>

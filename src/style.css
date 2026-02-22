@@ -93,6 +93,24 @@ p {
     margin-top: 0;
 }
 
+.auth-form {
+    margin: 1rem auto 0;
+    width: min(100%, 320px);
+    display: grid;
+    gap: 0.55rem;
+}
+
+.auth-pin-input {
+    text-align: center;
+    letter-spacing: 0.2em;
+    font-size: 1.05rem;
+    font-weight: 700;
+}
+
+.auth-submit-btn {
+    width: 100%;
+}
+
 .checklist-page {
     width: min(94vw, 860px);
 }
