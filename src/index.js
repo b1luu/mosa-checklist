@@ -14,6 +14,8 @@ if (checkboxInputs.length === 0) {
     const saveWorkerNameButton = document.querySelector('#saveWorkerNameButton');
     const sessionIdText = document.querySelector('#sessionIdText');
     const syncStatusText = document.querySelector('#syncStatusText');
+    const checklistType = window.location.pathname.includes('opening') ? 'opening' : 'closing';
+    const checklistTypeTitle = checklistType.charAt(0).toUpperCase() + checklistType.slice(1);
 
     const chunkNumbers = [...new Set(chunkSections.map((section) => Number(section.dataset.chunk)))].sort((a, b) => a - b);
     const defaultChunk = chunkNumbers[0] || 1;
@@ -29,6 +31,15 @@ if (checkboxInputs.length === 0) {
             chunkLabelByNumber[chunkNumber] = chunkLabel;
         }
     });
+
+    function getCheckboxLabelText(checkbox) {
+        const checkboxLabel = checkbox.closest('label');
+        if (!checkboxLabel) {
+            return checkbox.name;
+        }
+
+        return checkboxLabel.textContent.replace(/\s+/g, ' ').trim();
+    }
 
     chunkSections.forEach((section) => {
         const chunkNumber = Number(section.dataset.chunk);
@@ -50,14 +61,41 @@ if (checkboxInputs.length === 0) {
             chunkNumber,
             chunkLabel: chunkLabelByNumber[chunkNumber] || ''
         };
+    });
 
+    checkboxInputs.forEach((checkbox) => {
+        if (!sectionDetailsByName[checkbox.name]) {
+            const parentGroup = checkbox.closest('.checklist-group');
+            const parentHeading = parentGroup ? parentGroup.querySelector('h2') : null;
+            const parsedChunkNumber = parentGroup && parentGroup.dataset.chunk
+                ? Number(parentGroup.dataset.chunk)
+                : NaN;
+
+            sectionDetailsByName[checkbox.name] = {
+                sectionTitle: getCheckboxLabelText(checkbox),
+                chunkNumber: Number.isFinite(parsedChunkNumber) ? parsedChunkNumber : '',
+                chunkLabel: parentHeading ? parentHeading.textContent.trim() : ''
+            };
+        }
+
+        let metaElement = null;
         const sectionLabel = checkbox.closest('.section-complete');
         if (sectionLabel) {
-            const sectionMeta = document.createElement('p');
-            sectionMeta.className = 'section-meta';
-            sectionMeta.dataset.metaFor = checkbox.name;
-            sectionLabel.insertAdjacentElement('afterend', sectionMeta);
-            sectionMetaByName[checkbox.name] = sectionMeta;
+            metaElement = document.createElement('p');
+            metaElement.className = 'section-meta';
+            sectionLabel.insertAdjacentElement('afterend', metaElement);
+        } else {
+            const checkboxLabel = checkbox.closest('label');
+            if (checkboxLabel) {
+                metaElement = document.createElement('p');
+                metaElement.className = 'item-meta';
+                checkboxLabel.insertAdjacentElement('afterend', metaElement);
+            }
+        }
+
+        if (metaElement) {
+            metaElement.dataset.metaFor = checkbox.name;
+            sectionMetaByName[checkbox.name] = metaElement;
         }
     });
 
@@ -279,7 +317,7 @@ if (checkboxInputs.length === 0) {
 
         const exportedAtIso = new Date().toISOString();
         const csvContent = buildMasterCsvContent(rowsBySession, exportedAtIso);
-        downloadCsv(csvContent, 'mosa-closing-master.csv');
+        downloadCsv(csvContent, `mosa-${checklistType}-master.csv`);
         setArchiveStatus(`Master CSV: downloaded (${sourceLabel}) at ${formatCheckedAt(exportedAtIso)}`);
     }
 
@@ -435,7 +473,11 @@ if (checkboxInputs.length === 0) {
             const item = checklistState.items[name];
 
             if (!item || !item.checked) {
-                element.textContent = 'Not completed';
+                if (element.classList.contains('item-meta')) {
+                    element.textContent = '';
+                } else {
+                    element.textContent = 'Not completed';
+                }
                 return;
             }
 
@@ -758,9 +800,9 @@ if (checkboxInputs.length === 0) {
             }
 
             const db = firebaseApp.database();
-            dbRef = db.ref(`checklists/closing/${sessionId}`);
-            masterRowsRef = db.ref('reports/closing/masterRows');
-            setSyncStatus('Mode: Connecting to shared session...');
+            dbRef = db.ref(`checklists/${checklistType}/${sessionId}`);
+            masterRowsRef = db.ref(`reports/${checklistType}/masterRows`);
+            setSyncStatus(`Mode: Connecting to shared ${checklistTypeTitle} session...`);
 
             dbRef.on('value', (snapshot) => {
                 const remoteValue = snapshot.val();

@@ -17,7 +17,7 @@ Opening page now includes checklist sections for:
 - `Product Quality`
 - `Daily Prep`
 
-The opening checklist currently uses simple in-page checkboxes for quick completion flow.
+Opening checklist tasks now save by session date, require worker name attribution, and show checked-by/checked-at metadata.
 
 ## Current Closing Checklist Behavior
 - Split into two tabs:
@@ -33,18 +33,19 @@ The opening checklist currently uses simple in-page checkboxes for quick complet
 - Local fallback is saved in `localStorage`.
 
 ## Shared Multi-Worker Mode (QR Friendly)
-Goal: both closers see the same checklist state and who checked each section.
+Goal: workers on opening or closing see the same checklist state and who checked each item/section.
 
 How it works:
-- Add worker name in the `Worker name` field on the closing page.
+- Add worker name in the `Worker name` field on opening or closing page.
 - Use the same URL/session for both workers:
+  - Example: `opening.html?session=2026-02-21`
   - Example: `closing.html?session=2026-02-21`
 - When shared mode is enabled, updates sync live through Firebase Realtime Database.
 
 If shared mode is not configured, app runs in local-only mode automatically.
 
 ## Master CSV (Continuously Updated)
-Closing data can be kept in one continuously updated master dataset.
+Checklist data can be kept in continuously updated master datasets.
 
 How it works:
 - On every checklist change, section rows are updated in:
@@ -68,7 +69,7 @@ CSV columns:
 3. Set:
    - `enabled: true`
    - Firebase keys (`apiKey`, `authDomain`, `databaseURL`, `projectId`, `appId`)
-4. Deploy/host and share the same `closing.html?session=...` link in your QR code.
+4. Deploy/host and share the same `opening.html?session=...` or `closing.html?session=...` link in your QR code.
 
 ## Tech Stack
 - HTML

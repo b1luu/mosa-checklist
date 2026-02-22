@@ -10,31 +10,41 @@
     <main class="container checklist-page">
         <h1>Opening Checklist</h1>
         <p>Complete opening tasks before service.</p>
+        <section class="sync-panel" aria-label="Shared checklist controls">
+            <div class="sync-row">
+                <label class="sync-label" for="workerNameInput">Worker name</label>
+                <input id="workerNameInput" class="sync-input" type="text" maxlength="40" placeholder="Enter your name">
+                <button id="saveWorkerNameButton" class="sync-save-btn" type="button">Save</button>
+            </div>
+            <p id="workerNameError" class="sync-error" role="alert" aria-live="polite"></p>
+            <p class="sync-line">Session: <strong id="sessionIdText"></strong></p>
+            <p class="sync-line" id="syncStatusText">Mode: Local only</p>
+        </section>
 
         <section class="checklist-group">
             <h2>Lights</h2>
             <ul class="task-list">
                 <li class="task-item">
                     <label>
-                        <input type="checkbox">
+                        <input type="checkbox" name="open_lights_all">
                         Turn on all lights (see details)
                     </label>
                     <ul class="task-sublist">
                         <li class="task-item">
                             <label>
-                                <input type="checkbox">
+                                <input type="checkbox" name="open_lights_front_door_switches">
                                 4 switches by the front door
                             </label>
                         </li>
                         <li class="task-item">
                             <label>
-                                <input type="checkbox">
+                                <input type="checkbox" name="open_lights_restroom_switches">
                                 4 switches outside the restroom
                             </label>
                         </li>
                         <li class="task-item">
                             <label>
-                                <input type="checkbox">
+                                <input type="checkbox" name="open_lights_storage_hall_switch">
                                 1 switch for the storage hall
                             </label>
                         </li>
@@ -48,31 +58,31 @@
             <ul class="task-list">
                 <li class="task-item">
                     <label>
-                        <input type="checkbox">
+                        <input type="checkbox" name="open_machines_turn_on_4">
                         Turn on 4 machines
                     </label>
                 </li>
                 <li class="task-item">
                     <label>
-                        <input type="checkbox">
+                        <input type="checkbox" name="open_machines_sugar_dispenser_heat">
                         Turn on the Sugar Dispenser (also turn the heat on)
                     </label>
                 </li>
                 <li class="task-item">
                     <label>
-                        <input type="checkbox">
+                        <input type="checkbox" name="open_machines_plug_sealer">
                         Plug in Sealer
                     </label>
                 </li>
                 <li class="task-item">
                     <label>
-                        <input type="checkbox">
+                        <input type="checkbox" name="open_machines_plug_prep_station">
                         Plug in Prep Station
                     </label>
                 </li>
                 <li class="task-item">
                     <label>
-                        <input type="checkbox">
+                        <input type="checkbox" name="open_machines_plug_boba_warmer">
                         Plug in Boba Warmer
                     </label>
                 </li>
@@ -84,19 +94,19 @@
             <ul class="task-list">
                 <li class="task-item">
                     <label>
-                        <input type="checkbox">
+                        <input type="checkbox" name="open_systems_set_panda_doordash_tablet">
                         Set up Panda and DoorDash Tablet (charge if needed)
                     </label>
                 </li>
                 <li class="task-item">
                     <label>
-                        <input type="checkbox">
+                        <input type="checkbox" name="open_systems_put_up_stands_outside">
                         Put up stands outside
                     </label>
                 </li>
                 <li class="task-item">
                     <label>
-                        <input type="checkbox">
+                        <input type="checkbox" name="open_systems_pos_items_in_stock">
                         Turn on POS and make sure ITEMS available back in stock
                     </label>
                 </li>
@@ -108,43 +118,43 @@
             <ul class="task-list">
                 <li class="task-item">
                     <label>
-                        <input type="checkbox">
+                        <input type="checkbox" name="open_supplies_refill_receipt_label_paper">
                         Check and refill receipt paper and label paper if needed
                     </label>
                 </li>
                 <li class="task-item">
                     <label>
-                        <input type="checkbox">
+                        <input type="checkbox" name="open_supplies_trash_bags">
                         Check 5 trash cans are lined with trash bags
                     </label>
                 </li>
                 <li class="task-item">
                     <label>
-                        <input type="checkbox">
+                        <input type="checkbox" name="open_supplies_restroom_clean_check">
                         Check if restroom is clean and check supplies:
                     </label>
                     <ul class="task-sublist">
                         <li class="task-item">
                             <label>
-                                <input type="checkbox">
+                                <input type="checkbox" name="open_supplies_tissues">
                                 Tissues
                             </label>
                         </li>
                         <li class="task-item">
                             <label>
-                                <input type="checkbox">
+                                <input type="checkbox" name="open_supplies_toilet_paper">
                                 Toilet Paper
                             </label>
                         </li>
                         <li class="task-item">
                             <label>
-                                <input type="checkbox">
+                                <input type="checkbox" name="open_supplies_hand_paper_towels">
                                 Hand Paper Towels
                             </label>
                         </li>
                         <li class="task-item">
                             <label>
-                                <input type="checkbox">
+                                <input type="checkbox" name="open_supplies_hand_soap">
                                 Hand Soap
                             </label>
                         </li>
@@ -158,19 +168,19 @@
             <ul class="task-list">
                 <li class="task-item">
                     <label>
-                        <input type="checkbox">
+                        <input type="checkbox" name="open_quality_matcha_bottles">
                         Have at least 2 bottles of cooled down Matcha at all times
                     </label>
                 </li>
                 <li class="task-item">
                     <label>
-                        <input type="checkbox">
+                        <input type="checkbox" name="open_quality_taste_fruits_toppings_juice">
                         Taste all fruits, toppings, and juice to make sure good quality
                     </label>
                 </li>
                 <li class="task-item">
                     <label>
-                        <input type="checkbox">
+                        <input type="checkbox" name="open_quality_taste_all_tea">
                         Taste all tea to make sure the quality
                     </label>
                 </li>
@@ -182,7 +192,7 @@
             <ul class="task-list">
                 <li class="task-item">
                     <label>
-                        <input type="checkbox">
+                        <input type="checkbox" name="open_daily_prep_sample_whiteboard">
                         Prepare sample for the day (also update whiteboard)
                     </label>
                 </li>
@@ -193,5 +203,9 @@
             <a class="back-link" href="index.html">Back to Home</a>
         </div>
     </main>
+    <script src="shared-config.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-database-compat.js"></script>
+    <script src="index.js"></script>
 </body>
 </html>
