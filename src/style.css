@@ -249,6 +249,37 @@ p {
     flex-shrink: 0;
 }
 
+.task-list,
+.task-sublist {
+    list-style: none;
+    margin: 0.75rem 0 0;
+    padding-left: 0;
+    display: grid;
+    gap: 0.5rem;
+}
+
+.task-sublist {
+    margin-top: 0.5rem;
+    padding-left: 1.5rem;
+}
+
+.task-item label {
+    display: inline-flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    text-align: left;
+    color: var(--mosa-text);
+    line-height: 1.4;
+    cursor: pointer;
+}
+
+.task-item input[type="checkbox"] {
+    width: 1rem;
+    height: 1rem;
+    margin-top: 0.1rem;
+    accent-color: var(--mosa-green);
+}
+
 .section-complete {
     order: 99;
     margin-top: 0.8rem;
