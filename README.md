@@ -5,8 +5,19 @@ Simple full-stack learning project for Mosa Tea operations.
 
 Current app flow:
 - Landing page with two options: `Opening` and `Closing`
-- `Opening` page placeholder
+- `Opening` page with operational checklist sections
 - `Closing` page with a chunked checklist workflow
+
+## Current Opening Checklist Behavior
+Opening page now includes checklist sections for:
+- `Lights`
+- `Machines & Equipment`
+- `Systems & Front`
+- `Supplies & Cleanliness`
+- `Product Quality`
+- `Daily Prep`
+
+The opening checklist currently uses simple in-page checkboxes for quick completion flow.
 
 ## Current Closing Checklist Behavior
 - Split into two tabs:
@@ -76,7 +87,7 @@ Then open: `http://localhost:5500`
 
 ## Project Structure
 - `src/index.html` - landing page
-- `src/opening.html` - opening page (placeholder)
+- `src/opening.html` - opening checklist UI
 - `src/closing.html` - closing checklist UI
 - `src/style.css` - global styles and checklist styles
 - `src/index.js` - checklist logic, chunk controls, checked-by metadata, local + shared sync, master CSV updates/export
