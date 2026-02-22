@@ -313,7 +313,6 @@ p {
     color: var(--mosa-muted);
     font-size: 0.8rem;
     line-height: 1.3;
-    min-height: 1em;
 }
 
 .chunk-tabs {
