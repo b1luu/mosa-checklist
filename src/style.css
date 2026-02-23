@@ -104,7 +104,7 @@ p {
     top: calc(env(safe-area-inset-top, 0px) + 0.75rem);
     right: calc(env(safe-area-inset-right, 0px) + 0.75rem);
     z-index: 130;
-    width: 11.5rem;
+    width: 2.1rem;
     display: flex;
     justify-content: flex-end;
     align-items: flex-start;
@@ -132,7 +132,7 @@ p {
     position: absolute;
     top: 100%;
     right: 0;
-    width: 100%;
+    width: 11.5rem;
     border: 1px solid rgba(76, 76, 76, 0.25);
     background: rgba(255, 255, 255, 0.96);
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.12);
