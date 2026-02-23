@@ -27,11 +27,7 @@
         <h1>Opening Checklist</h1>
         <p>Complete opening tasks before service.</p>
         <section class="sync-panel" aria-label="Shared checklist controls">
-            <div class="sync-row">
-                <label class="sync-label" for="workerNameInput">Worker name</label>
-                <input id="workerNameInput" class="sync-input" type="text" maxlength="40" placeholder="Enter your name">
-            </div>
-            <p id="workerNameError" class="sync-error" role="alert" aria-live="polite"></p>
+            <p class="sync-line">Signed in as: <strong id="signedInNameText"></strong></p>
             <p class="sync-line">Session: <strong id="sessionIdText"></strong></p>
             <p class="sync-line" id="syncStatusText">Mode: Local only</p>
         </section>
