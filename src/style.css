@@ -104,6 +104,10 @@ p {
     top: calc(env(safe-area-inset-top, 0px) + 0.75rem);
     right: calc(env(safe-area-inset-right, 0px) + 0.75rem);
     z-index: 120;
+    width: 11.5rem;
+    display: flex;
+    justify-content: flex-end;
+    align-items: flex-start;
 }
 
 .menu-trigger {
@@ -122,7 +126,7 @@ p {
     position: absolute;
     top: 100%;
     right: 0;
-    min-width: 11.5rem;
+    width: 100%;
     border: 1px solid rgba(76, 76, 76, 0.25);
     background: rgba(255, 255, 255, 0.96);
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.12);
