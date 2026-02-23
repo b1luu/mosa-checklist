@@ -100,13 +100,25 @@
         window.location.replace(`login.html?${REDIRECT_PARAM}=${redirectParam}`);
     }
 
+    function wireLogoutButtons() {
+        const logoutButtons = Array.from(document.querySelectorAll("[data-logout-btn]"));
+
+        logoutButtons.forEach((button) => {
+            button.addEventListener("click", () => {
+                logout();
+            });
+        });
+    }
+
     function requireAccess() {
         const config = getConfig();
         if (!config.enabled) {
+            wireLogoutButtons();
             return true;
         }
 
         if (isAuthenticated()) {
+            wireLogoutButtons();
             return true;
         }
 

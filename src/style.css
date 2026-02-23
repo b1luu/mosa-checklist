@@ -93,6 +93,11 @@ p {
     margin-top: 0;
 }
 
+.logout-btn {
+    cursor: pointer;
+    appearance: none;
+}
+
 .auth-form {
     margin: 1rem auto 0;
     width: min(100%, 320px);
