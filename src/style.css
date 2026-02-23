@@ -107,13 +107,13 @@ p {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 2.1rem;
-    height: 2.1rem;
+    width: 1.78rem;
+    height: 1.78rem;
     border: 1px solid rgba(76, 76, 76, 0.35);
     border-radius: 999px;
     background: rgba(255, 255, 255, 0.9);
     color: var(--mosa-green);
-    font-size: 1rem;
+    font-size: 0.85rem;
     font-weight: 700;
     line-height: 1;
     text-decoration: none;
