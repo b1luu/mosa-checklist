@@ -2,6 +2,8 @@
     const AUTH_STORAGE_KEY = "mosa:pinAuth";
     const REDIRECT_PARAM = "redirect";
     const DEFAULT_REMEMBER_HOURS = 12;
+    const WORKER_NAME_KEY = "mosa:workerName";
+    const WORKER_NAME_PATTERN = /^[a-zA-Z0-9][a-zA-Z0-9 .'-]*$/;
 
     function getConfig() {
         const rootConfig = window.MOSA_SHARED_CONFIG || {};
@@ -47,6 +49,41 @@
         } catch {
             return null;
         }
+    }
+
+    function loadWorkerName() {
+        return (localStorage.getItem(WORKER_NAME_KEY) || "").trim();
+    }
+
+    function saveWorkerName(name) {
+        const trimmedName = String(name || "").trim();
+        if (trimmedName) {
+            localStorage.setItem(WORKER_NAME_KEY, trimmedName);
+            return;
+        }
+
+        localStorage.removeItem(WORKER_NAME_KEY);
+    }
+
+    function getWorkerNameValidationMessage(name) {
+        const trimmedName = String(name || "").trim();
+        if (!trimmedName) {
+            return "Enter your name.";
+        }
+
+        if (trimmedName.length < 2) {
+            return "Name must be at least 2 characters.";
+        }
+
+        if (!WORKER_NAME_PATTERN.test(trimmedName)) {
+            return "Use letters, numbers, spaces, apostrophes, periods, or hyphens.";
+        }
+
+        return "";
+    }
+
+    function isValidWorkerName(name) {
+        return getWorkerNameValidationMessage(name) === "";
     }
 
     function saveAuthRecord(rememberHours) {
@@ -327,6 +364,12 @@
         }
 
         if (isAuthenticated()) {
+            if (!isValidWorkerName(loadWorkerName())) {
+                clearAuthRecord();
+                goToLogin();
+                return false;
+            }
+
             wireMenuControls();
             return true;
         }
@@ -356,10 +399,11 @@
     function initLoginPage() {
         const config = getConfig();
         const form = document.querySelector("#pinLoginForm");
+        const workerNameInput = document.querySelector("#workerNameInput");
         const pinInput = document.querySelector("#pinInput");
         const errorElement = document.querySelector("#pinError");
 
-        if (!form || !pinInput) {
+        if (!form || !pinInput || !workerNameInput) {
             return;
         }
 
@@ -378,6 +422,14 @@
             return;
         }
 
+        workerNameInput.value = "";
+
+        workerNameInput.addEventListener("input", () => {
+            if (errorElement && errorElement.classList.contains("is-visible")) {
+                setError(errorElement, "");
+            }
+        });
+
         pinInput.addEventListener("input", () => {
             const onlyDigits = pinInput.value.replace(/\D/g, "").slice(0, 4);
             pinInput.value = onlyDigits;
@@ -389,7 +441,15 @@
 
         form.addEventListener("submit", (event) => {
             event.preventDefault();
+            const workerName = workerNameInput.value.trim();
             const pin = pinInput.value.trim();
+            const nameValidationMessage = getWorkerNameValidationMessage(workerName);
+
+            if (nameValidationMessage) {
+                setError(errorElement, nameValidationMessage);
+                workerNameInput.focus();
+                return;
+            }
 
             if (!/^\d{4}$/.test(pin)) {
                 setError(errorElement, "Enter a valid 4-digit PIN.");
@@ -403,6 +463,7 @@
                 return;
             }
 
+            saveWorkerName(workerName);
             saveAuthRecord(config.rememberHours);
             window.location.replace(getRedirectUrl());
         });
@@ -410,6 +471,7 @@
 
     function logout() {
         clearAuthRecord();
+        saveWorkerName("");
         window.location.replace("login.html");
     }
 
