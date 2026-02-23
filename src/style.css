@@ -120,7 +120,7 @@ p {
 
 .menu-dropdown {
     position: absolute;
-    top: calc(100% + 0.35rem);
+    top: 100%;
     right: 0;
     min-width: 11.5rem;
     border: 1px solid rgba(76, 76, 76, 0.25);
@@ -132,7 +132,7 @@ p {
     opacity: 0;
     visibility: hidden;
     pointer-events: none;
-    transform: translateY(-4px);
+    transform: translateY(-2px);
     transition: opacity 0.16s ease, transform 0.16s ease, visibility 0.16s ease;
 }
 
