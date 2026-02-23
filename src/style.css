@@ -508,3 +508,53 @@ p {
     opacity: 0.5;
     cursor: not-allowed;
 }
+
+.submit-action {
+    margin-top: 0.8rem;
+    display: flex;
+    justify-content: center;
+}
+
+.submit-checklist-btn {
+    border: 1px solid #2f3d22;
+    background: #2f3d22;
+    color: var(--mosa-white);
+    font-family: var(--font-main);
+    font-size: 1rem;
+    font-weight: 700;
+    padding: 0.72rem 1.1rem;
+    min-width: 230px;
+    cursor: pointer;
+}
+
+.submit-checklist-btn:hover {
+    background: #3c4b2c;
+    border-color: #3c4b2c;
+}
+
+.submit-checklist-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.confirmation-panel {
+    margin: 1rem auto 0;
+    width: min(100%, 420px);
+    padding: 0.85rem;
+    border: 1px solid rgba(76, 76, 76, 0.2);
+    background: rgba(255, 255, 255, 0.55);
+}
+
+.confirmation-meta {
+    margin: 0.45rem 0 0;
+    text-align: left;
+    color: var(--mosa-muted);
+    font-size: 0.9rem;
+    line-height: 1.35;
+}
+
+.confirmation-thanks {
+    margin-top: 0.35rem;
+    font-weight: 700;
+    color: var(--mosa-green);
+}

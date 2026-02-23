@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mosa Tea Submission</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <main class="container">
+        <div class="page-menu" data-menu-root>
+            <button
+                type="button"
+                class="menu-trigger"
+                data-menu-trigger
+                aria-label="Open menu"
+                aria-expanded="false"
+            >
+                ⚙
+            </button>
+            <div class="menu-dropdown" data-menu-panel>
+                <button type="button" class="menu-item" data-menu-download>Download Master CSV</button>
+                <button type="button" class="menu-item" data-logout-btn>Log Out</button>
+            </div>
+        </div>
+
+        <h1 id="confirmationTitle">Submitted</h1>
+        <p id="confirmationMessage">Checklist submitted successfully.</p>
+        <p class="confirmation-thanks">Thank you!</p>
+
+        <section class="confirmation-panel" aria-label="Submission details">
+            <p class="confirmation-meta" id="confirmationType"></p>
+            <p class="confirmation-meta" id="confirmationSession"></p>
+            <p class="confirmation-meta" id="confirmationBy"></p>
+            <p class="confirmation-meta" id="confirmationAt"></p>
+        </section>
+
+        <div class="mode-buttons">
+            <a class="mode-btn" href="index.html">Home</a>
+            <a class="back-link" id="confirmationReturnLink" href="index.html">Back to Checklist</a>
+        </div>
+    </main>
+    <script src="shared-config.js"></script>
+    <script src="auth.js"></script>
+    <script>
+        window.MosaPinAuth.requireAccess();
+    </script>
+    <script src="confirmation.js"></script>
+</body>
+</html>

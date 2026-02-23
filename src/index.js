@@ -6,6 +6,7 @@ if (checkboxInputs.length === 0) {
     const chunkSections = Array.from(document.querySelectorAll('.checklist-group[data-chunk]'));
     const chunkTabs = Array.from(document.querySelectorAll('.chunk-tab'));
     const completeChunkButton = document.querySelector('[data-chunk-action="complete-next"]');
+    const submitChecklistButton = document.querySelector('[data-submit-checklist]');
     const chunkStatus = document.querySelector('.chunk-status');
     const downloadCsvButton = document.querySelector('#downloadCsvButton');
     const archiveStatusText = document.querySelector('#archiveStatusText');
@@ -117,6 +118,7 @@ if (checkboxInputs.length === 0) {
     const REDIRECT_PARAM = 'redirect';
     const MASTER_ROWS_STORAGE_KEY = `mosa:${window.location.pathname}:master-rows`;
     const MASTER_ROWS_UPDATED_AT_KEY = `mosa:${window.location.pathname}:master-updated-at`;
+    const SUBMISSIONS_STORAGE_KEY = `mosa:${window.location.pathname}:submissions`;
 
     const sharedConfig = window.MOSA_SHARED_CONFIG || {};
     const firebaseConfig = sharedConfig.firebase || {};
@@ -207,6 +209,30 @@ if (checkboxInputs.length === 0) {
 
     function saveLocalMasterRows(masterRows) {
         localStorage.setItem(MASTER_ROWS_STORAGE_KEY, JSON.stringify(masterRows));
+    }
+
+    function loadLocalSubmissions() {
+        const raw = localStorage.getItem(SUBMISSIONS_STORAGE_KEY);
+        if (!raw) {
+            return {};
+        }
+
+        try {
+            const parsed = JSON.parse(raw);
+            if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+                return {};
+            }
+
+            return parsed;
+        } catch {
+            return {};
+        }
+    }
+
+    function saveLocalSubmissionRecord(record) {
+        const submissions = loadLocalSubmissions();
+        submissions[sessionId] = record;
+        localStorage.setItem(SUBMISSIONS_STORAGE_KEY, JSON.stringify(submissions));
     }
 
     function createMasterRow(itemName) {
@@ -507,6 +533,8 @@ if (checkboxInputs.length === 0) {
     }
 
     function updateCompleteChunkButton() {
+        updateSubmitButtonState();
+
         if (!completeChunkButton || chunkNumbers.length === 0) {
             return;
         }
@@ -530,6 +558,19 @@ if (checkboxInputs.length === 0) {
 
         completeChunkButton.textContent = isLastChunk ? 'Complete Final Chunk' : 'Complete This Chunk';
         completeChunkButton.disabled = false;
+    }
+
+    function updateSubmitButtonState() {
+        if (!submitChecklistButton) {
+            return;
+        }
+
+        const allComplete = checkboxInputs.every((checkbox) => {
+            const item = checklistState.items[checkbox.name];
+            return Boolean(item && item.checked);
+        });
+
+        submitChecklistButton.disabled = !allComplete;
     }
 
     function renderActiveChunk() {
@@ -757,6 +798,64 @@ if (checkboxInputs.length === 0) {
         }
     }
 
+    function wireSubmitControls() {
+        if (!submitChecklistButton) {
+            return;
+        }
+
+        submitChecklistButton.addEventListener('click', () => {
+            const uncheckedItemNames = checkboxInputs
+                .map((checkbox) => checkbox.name)
+                .filter((name) => !checklistState.items[name] || !checklistState.items[name].checked);
+
+            if (uncheckedItemNames.length > 0) {
+                const firstUnchecked = uncheckedItemNames[0];
+                const firstUncheckedDetails = sectionDetailsByName[firstUnchecked];
+
+                if (firstUncheckedDetails && chunkNumbers.includes(firstUncheckedDetails.chunkNumber)) {
+                    setActiveChunk(firstUncheckedDetails.chunkNumber);
+                }
+
+                window.alert(`Please complete all tasks before submitting (${uncheckedItemNames.length} remaining).`);
+                return;
+            }
+
+            const actor = requireWorkerName();
+            if (!actor) {
+                return;
+            }
+
+            const submittedAt = new Date().toISOString();
+            const submissionRecord = {
+                checklistType,
+                sessionId,
+                submittedBy: actor,
+                submittedAt,
+                totalItems: checkboxInputs.length
+            };
+
+            saveLocalSubmissionRecord(submissionRecord);
+
+            if (dbRef) {
+                dbRef.update({
+                    submittedBy: actor,
+                    submittedAt
+                }).catch(() => {
+                    setSyncStatus('Mode: Shared sync error. Submission stored locally.');
+                });
+            }
+
+            const confirmationParams = new URLSearchParams({
+                type: checklistType,
+                session: sessionId,
+                by: actor,
+                at: submittedAt
+            });
+
+            window.location.assign(`confirmation.html?${confirmationParams.toString()}`);
+        });
+    }
+
     function initSharedSync() {
         if (!sharedConfig.enabled || sharedConfig.provider !== 'firebase') {
             setSyncStatus('Mode: Local only (shared sync disabled)');
@@ -827,6 +926,7 @@ if (checkboxInputs.length === 0) {
     wireCsvControls();
     wireCheckboxControls();
     wireChunkControls();
+    wireSubmitControls();
     applyStateToUI();
     syncMasterRows(checkboxInputs.map((checkbox) => checkbox.name), { includeShared: false });
     initSharedSync();
