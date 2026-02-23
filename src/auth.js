@@ -446,6 +446,7 @@
         const form = document.querySelector("#pinLoginForm");
         const pinInput = document.querySelector("#pinInput");
         const errorElement = document.querySelector("#pinError");
+        let isRedirecting = false;
 
         if (!form || !pinInput) {
             return;
@@ -472,12 +473,35 @@
             saveWorkerName("");
         }
 
+        function completeLogin(pin) {
+            if (isRedirecting) {
+                return true;
+            }
+
+            const workerName = getWorkerNameFromPin(pin);
+            if (!workerName || !verifyPin(pin)) {
+                return false;
+            }
+
+            isRedirecting = true;
+            saveWorkerName(workerName);
+            saveAuthRecord(config.rememberHours);
+            window.location.replace(getRedirectUrl());
+            return true;
+        }
+
         pinInput.addEventListener("input", () => {
             const onlyDigits = pinInput.value.replace(/\D/g, "").slice(0, 4);
             pinInput.value = onlyDigits;
 
             if (errorElement && errorElement.classList.contains("is-visible")) {
                 setError(errorElement, "");
+            }
+
+            if (onlyDigits.length === 4) {
+                if (!completeLogin(onlyDigits)) {
+                    setError(errorElement, "Incorrect PIN. Try again.");
+                }
             }
         });
 
@@ -491,16 +515,11 @@
                 return;
             }
 
-            const workerName = getWorkerNameFromPin(pin);
-            if (!workerName || !verifyPin(pin)) {
+            if (!completeLogin(pin)) {
                 setError(errorElement, "Incorrect PIN. Try again.");
                 pinInput.focus();
                 return;
             }
-
-            saveWorkerName(workerName);
-            saveAuthRecord(config.rememberHours);
-            window.location.replace(getRedirectUrl());
         });
     }
 
