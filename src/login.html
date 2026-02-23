@@ -12,6 +12,16 @@
         <p>Enter your 4-digit clock-in PIN.</p>
 
         <form id="pinLoginForm" class="auth-form" novalidate>
+            <label class="sync-label" for="workerNameInput">Name</label>
+            <input
+                id="workerNameInput"
+                class="sync-input"
+                type="text"
+                maxlength="40"
+                autocomplete="name"
+                placeholder="Your name"
+                required
+            >
             <label class="sync-label" for="pinInput">PIN</label>
             <input
                 id="pinInput"
