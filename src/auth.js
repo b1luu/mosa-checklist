@@ -100,25 +100,234 @@
         window.location.replace(`login.html?${REDIRECT_PARAM}=${redirectParam}`);
     }
 
-    function wireLogoutButtons() {
-        const logoutButtons = Array.from(document.querySelectorAll("[data-logout-btn]"));
+    function escapeCsvValue(rawValue) {
+        const value = rawValue == null ? "" : String(rawValue);
+        return `"${value.replace(/"/g, '""')}"`;
+    }
 
-        logoutButtons.forEach((button) => {
-            button.addEventListener("click", () => {
-                logout();
-            });
+    function downloadCsvFile(fileName, content) {
+        const csvBlob = new Blob([content], { type: "text/csv;charset=utf-8;" });
+        const csvUrl = URL.createObjectURL(csvBlob);
+        const anchor = document.createElement("a");
+        anchor.href = csvUrl;
+        anchor.download = fileName;
+        document.body.appendChild(anchor);
+        anchor.click();
+        document.body.removeChild(anchor);
+        URL.revokeObjectURL(csvUrl);
+    }
+
+    function getChecklistTypeFromStorageKey(storageKey) {
+        const keyMatch = storageKey.match(/^mosa:(.+):master-rows$/);
+        if (!keyMatch) {
+            return "";
+        }
+
+        const pathPart = keyMatch[1];
+        if (pathPart.includes("opening")) {
+            return "opening";
+        }
+
+        if (pathPart.includes("closing")) {
+            return "closing";
+        }
+
+        return "unknown";
+    }
+
+    function collectLocalMasterRows() {
+        const rows = [];
+
+        for (let index = 0; index < localStorage.length; index += 1) {
+            const storageKey = localStorage.key(index);
+            if (!storageKey || !storageKey.endsWith(":master-rows")) {
+                continue;
+            }
+
+            const checklistType = getChecklistTypeFromStorageKey(storageKey);
+
+            try {
+                const parsed = JSON.parse(localStorage.getItem(storageKey) || "{}");
+                if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
+                    continue;
+                }
+
+                Object.keys(parsed).forEach((sessionId) => {
+                    const sessionRows = parsed[sessionId];
+                    if (!sessionRows || typeof sessionRows !== "object" || Array.isArray(sessionRows)) {
+                        return;
+                    }
+
+                    Object.keys(sessionRows).forEach((sectionKey) => {
+                        const row = sessionRows[sectionKey] || {};
+                        rows.push({
+                            checklistType,
+                            sessionId: row.sessionId || sessionId,
+                            sectionKey: row.sectionKey || sectionKey,
+                            sectionTitle: row.sectionTitle || "",
+                            chunkNumber: row.chunkNumber || "",
+                            chunkLabel: row.chunkLabel || "",
+                            completed: row.completed ? "TRUE" : "FALSE",
+                            checkedBy: row.checkedBy || "",
+                            checkedAt: row.checkedAt || "",
+                            lastUpdatedBy: row.lastUpdatedBy || "",
+                            lastUpdatedAt: row.lastUpdatedAt || ""
+                        });
+                    });
+                });
+            } catch {
+                // Skip malformed local storage records.
+            }
+        }
+
+        rows.sort((a, b) => {
+            return a.checklistType.localeCompare(b.checklistType)
+                || a.sessionId.localeCompare(b.sessionId)
+                || a.sectionKey.localeCompare(b.sectionKey);
+        });
+
+        return rows;
+    }
+
+    function buildMasterCsvContent(rows, exportedAtIso) {
+        const header = [
+            "exported_at",
+            "checklist_type",
+            "session_id",
+            "section_key",
+            "section_title",
+            "chunk_number",
+            "chunk_label",
+            "completed",
+            "checked_by",
+            "checked_at",
+            "last_updated_by",
+            "last_updated_at"
+        ];
+
+        const csvRows = rows.map((row) => ([
+            exportedAtIso,
+            row.checklistType,
+            row.sessionId,
+            row.sectionKey,
+            row.sectionTitle,
+            row.chunkNumber,
+            row.chunkLabel,
+            row.completed,
+            row.checkedBy,
+            row.checkedAt,
+            row.lastUpdatedBy,
+            row.lastUpdatedAt
+        ]));
+
+        return [header, ...csvRows]
+            .map((row) => row.map((value) => escapeCsvValue(value)).join(","))
+            .join("\n");
+    }
+
+    function downloadMasterCsvFallback() {
+        const rows = collectLocalMasterRows();
+
+        if (rows.length === 0) {
+            window.alert("No master CSV data yet.");
+            return;
+        }
+
+        const exportedAtIso = new Date().toISOString();
+        const csvContent = buildMasterCsvContent(rows, exportedAtIso);
+        downloadCsvFile("mosa-master.csv", csvContent);
+    }
+
+    function downloadMasterCsv() {
+        if (
+            window.MosaChecklistActions
+            && typeof window.MosaChecklistActions.downloadMasterCsv === "function"
+        ) {
+            window.MosaChecklistActions.downloadMasterCsv();
+            return;
+        }
+
+        downloadMasterCsvFallback();
+    }
+
+    function closeMenu(menuRoot) {
+        const trigger = menuRoot.querySelector("[data-menu-trigger]");
+        const panel = menuRoot.querySelector("[data-menu-panel]");
+
+        if (panel) {
+            panel.hidden = true;
+        }
+
+        if (trigger) {
+            trigger.setAttribute("aria-expanded", "false");
+        }
+    }
+
+    function closeAllMenus() {
+        const menuRoots = Array.from(document.querySelectorAll("[data-menu-root]"));
+        menuRoots.forEach((menuRoot) => closeMenu(menuRoot));
+    }
+
+    function wireMenuControls() {
+        const menuRoots = Array.from(document.querySelectorAll("[data-menu-root]"));
+
+        menuRoots.forEach((menuRoot) => {
+            const trigger = menuRoot.querySelector("[data-menu-trigger]");
+            const panel = menuRoot.querySelector("[data-menu-panel]");
+            const downloadButton = menuRoot.querySelector("[data-menu-download]");
+            const logoutButton = menuRoot.querySelector("[data-logout-btn]");
+
+            if (trigger && panel) {
+                trigger.addEventListener("click", (event) => {
+                    event.stopPropagation();
+                    const shouldOpen = panel.hidden;
+
+                    closeAllMenus();
+
+                    panel.hidden = !shouldOpen;
+                    trigger.setAttribute("aria-expanded", shouldOpen ? "true" : "false");
+                });
+
+                panel.addEventListener("click", (event) => {
+                    event.stopPropagation();
+                });
+            }
+
+            if (downloadButton) {
+                downloadButton.addEventListener("click", () => {
+                    closeMenu(menuRoot);
+                    downloadMasterCsv();
+                });
+            }
+
+            if (logoutButton) {
+                logoutButton.addEventListener("click", () => {
+                    closeMenu(menuRoot);
+                    logout();
+                });
+            }
+        });
+
+        document.addEventListener("click", () => {
+            closeAllMenus();
+        });
+
+        document.addEventListener("keydown", (event) => {
+            if (event.key === "Escape") {
+                closeAllMenus();
+            }
         });
     }
 
     function requireAccess() {
         const config = getConfig();
         if (!config.enabled) {
-            wireLogoutButtons();
+            wireMenuControls();
             return true;
         }
 
         if (isAuthenticated()) {
-            wireLogoutButtons();
+            wireMenuControls();
             return true;
         }
 

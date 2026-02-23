@@ -842,6 +842,9 @@ if (checkboxInputs.length === 0) {
         }
     }
 
+    window.MosaChecklistActions = window.MosaChecklistActions || {};
+    window.MosaChecklistActions.downloadMasterCsv = downloadMasterCsvNow;
+
     if (sessionIdText) {
         sessionIdText.textContent = sessionId;
     }
