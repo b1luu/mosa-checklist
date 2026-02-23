@@ -36,7 +36,8 @@ Opening checklist tasks now save by session date, require worker name attributio
 Goal: workers on opening or closing see the same checklist state and who checked each item/section.
 
 How it works:
-- Sign in once on `login.html` with your name and 4-digit PIN.
+- Sign in once on `login.html` with your 4-digit PIN.
+- Each PIN maps to a worker name in config.
 - Opening/closing pages display `Signed in as: [name]`.
 - Use the same URL/session for both workers:
   - Example: `opening.html?session=2026-02-21`
@@ -80,11 +81,9 @@ CSV columns:
 ## Simple PIN Access
 - New login page: `src/login.html`
 - Protected pages: `index.html`, `opening.html`, `closing.html`
-- Login requires both:
-  - worker name
-  - 4-digit clock-in PIN
-- Configure allowed 4-digit clock-in PIN code(s) in `src/shared-config.js`:
-  - `auth.pinCodes` (array of strings, e.g. `["1234", "5678"]`)
+- Login requires a 4-digit clock-in PIN.
+- Configure PIN-to-name mapping in `src/shared-config.js`:
+  - `auth.pinUsers` (object, e.g. `{ "1234": "Alex", "5678": "Jamie" }`)
   - `auth.rememberHours` (how long access stays valid on the device)
 
 ## Local Development

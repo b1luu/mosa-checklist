@@ -13,15 +13,41 @@
             : authConfig.pinCode
                 ? [authConfig.pinCode]
                 : [];
+        const pinUsers = {};
+
+        if (authConfig.pinUsers && typeof authConfig.pinUsers === "object") {
+            Object.entries(authConfig.pinUsers).forEach(([rawPin, rawName]) => {
+                const pin = String(rawPin || "").trim();
+                const name = String(rawName || "").trim();
+
+                if (!/^\d{4}$/.test(pin)) {
+                    return;
+                }
+
+                if (!isValidWorkerName(name)) {
+                    return;
+                }
+
+                pinUsers[pin] = name;
+            });
+        }
+
+        // Backward compatibility: allow pinCodes array without names.
+        if (Object.keys(pinUsers).length === 0) {
+            pinCodes
+                .map((code) => String(code).trim())
+                .filter((code) => /^\d{4}$/.test(code))
+                .forEach((pin) => {
+                    pinUsers[pin] = `Worker ${pin}`;
+                });
+        }
 
         return {
             enabled: authConfig.enabled !== false,
             rememberHours: Number(authConfig.rememberHours) > 0
                 ? Number(authConfig.rememberHours)
                 : DEFAULT_REMEMBER_HOURS,
-            pinCodes: pinCodes
-                .map((code) => String(code).trim())
-                .filter((code) => /^\d{4}$/.test(code))
+            pinUsers
         };
     }
 
@@ -135,6 +161,15 @@
         const currentPathWithSearch = `${window.location.pathname.split("/").pop()}${window.location.search}`;
         const redirectParam = encodeURIComponent(currentPathWithSearch || "index.html");
         window.location.replace(`login.html?${REDIRECT_PARAM}=${redirectParam}`);
+    }
+
+    function renderSignedInName(name) {
+        const signedInNameElement = document.querySelector("#signedInNameText");
+        if (!signedInNameElement) {
+            return;
+        }
+
+        signedInNameElement.textContent = String(name || "").trim();
     }
 
     function escapeCsvValue(rawValue) {
@@ -364,13 +399,15 @@
         }
 
         if (isAuthenticated()) {
-            if (!isValidWorkerName(loadWorkerName())) {
+            const workerName = loadWorkerName();
+            if (!isValidWorkerName(workerName)) {
                 clearAuthRecord();
                 goToLogin();
                 return false;
             }
 
             wireMenuControls();
+            renderSignedInName(workerName);
             return true;
         }
 
@@ -378,13 +415,17 @@
         return false;
     }
 
-    function verifyPin(pinValue) {
+    function getWorkerNameFromPin(pinValue) {
         const config = getConfig();
         if (!config.enabled) {
-            return true;
+            return "";
         }
 
-        return config.pinCodes.includes(pinValue);
+        return config.pinUsers[pinValue] || "";
+    }
+
+    function verifyPin(pinValue) {
+        return Boolean(getWorkerNameFromPin(pinValue));
     }
 
     function setError(errorElement, message) {
@@ -399,11 +440,10 @@
     function initLoginPage() {
         const config = getConfig();
         const form = document.querySelector("#pinLoginForm");
-        const workerNameInput = document.querySelector("#workerNameInput");
         const pinInput = document.querySelector("#pinInput");
         const errorElement = document.querySelector("#pinError");
 
-        if (!form || !pinInput || !workerNameInput) {
+        if (!form || !pinInput) {
             return;
         }
 
@@ -412,23 +452,21 @@
             return;
         }
 
-        if (config.pinCodes.length === 0) {
-            setError(errorElement, "No PIN configured yet. Update shared-config.js.");
+        if (Object.keys(config.pinUsers).length === 0) {
+            setError(errorElement, "No PIN mapping configured. Update shared-config.js.");
             return;
         }
 
         if (isAuthenticated()) {
-            window.location.replace(getRedirectUrl());
-            return;
-        }
-
-        workerNameInput.value = "";
-
-        workerNameInput.addEventListener("input", () => {
-            if (errorElement && errorElement.classList.contains("is-visible")) {
-                setError(errorElement, "");
+            const savedWorkerName = loadWorkerName();
+            if (isValidWorkerName(savedWorkerName)) {
+                window.location.replace(getRedirectUrl());
+                return;
             }
-        });
+
+            clearAuthRecord();
+            saveWorkerName("");
+        }
 
         pinInput.addEventListener("input", () => {
             const onlyDigits = pinInput.value.replace(/\D/g, "").slice(0, 4);
@@ -441,15 +479,7 @@
 
         form.addEventListener("submit", (event) => {
             event.preventDefault();
-            const workerName = workerNameInput.value.trim();
             const pin = pinInput.value.trim();
-            const nameValidationMessage = getWorkerNameValidationMessage(workerName);
-
-            if (nameValidationMessage) {
-                setError(errorElement, nameValidationMessage);
-                workerNameInput.focus();
-                return;
-            }
 
             if (!/^\d{4}$/.test(pin)) {
                 setError(errorElement, "Enter a valid 4-digit PIN.");
@@ -457,7 +487,8 @@
                 return;
             }
 
-            if (!verifyPin(pin)) {
+            const workerName = getWorkerNameFromPin(pin);
+            if (!workerName || !verifyPin(pin)) {
                 setError(errorElement, "Incorrect PIN. Try again.");
                 pinInput.focus();
                 return;

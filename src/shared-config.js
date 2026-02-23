@@ -5,9 +5,15 @@ window.MOSA_SHARED_CONFIG = {
     auth: {
         // Keep true to require PIN login on index/opening/closing pages.
         enabled: true,
-        // Add one or more 4-digit clock-in PIN codes.
-        // Example: ["1234", "5678"]
-        pinCodes: ["0000"],
+        // Map each 4-digit clock-in PIN to a worker display name.
+        // Example:
+        // pinUsers: {
+        //     "1234": "Alex",
+        //     "5678": "Jamie"
+        // }
+        pinUsers: {
+            "0000": "Mosa Worker"
+        },
         // How long PIN access remains valid in this browser.
         rememberHours: 12
     },

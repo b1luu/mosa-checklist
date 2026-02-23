@@ -99,11 +99,41 @@ p {
     appearance: none;
 }
 
+.signed-in-badge {
+    position: fixed;
+    top: calc(env(safe-area-inset-top, 0px) + 0.75rem);
+    left: calc(env(safe-area-inset-left, 0px) + 0.75rem);
+    z-index: 125;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    max-width: min(70vw, 18rem);
+    padding: 0.42rem 0.66rem;
+    border: 1px solid rgba(76, 76, 76, 0.3);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.9);
+    color: var(--mosa-green);
+    font-size: 0.82rem;
+    font-weight: 700;
+    line-height: 1.2;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    backdrop-filter: blur(2px);
+}
+
+.signed-in-badge strong {
+    color: var(--mosa-text);
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
 .page-menu {
     position: fixed;
     top: calc(env(safe-area-inset-top, 0px) + 0.75rem);
     right: calc(env(safe-area-inset-right, 0px) + 0.75rem);
-    z-index: 120;
+    z-index: 130;
     width: 11.5rem;
     display: flex;
     justify-content: flex-end;
@@ -467,4 +497,12 @@ p {
 .chunk-complete-btn:disabled {
     opacity: 0.5;
     cursor: not-allowed;
+}
+
+@media (max-width: 640px) {
+    .signed-in-badge {
+        max-width: calc(100vw - 5.5rem);
+        font-size: 0.76rem;
+        padding: 0.38rem 0.58rem;
+    }
 }
