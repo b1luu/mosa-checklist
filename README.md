@@ -76,6 +76,13 @@ CSV columns:
 - CSS
 - Vanilla JavaScript
 
+## Simple PIN Access
+- New login page: `src/login.html`
+- Protected pages: `index.html`, `opening.html`, `closing.html`
+- Configure allowed 4-digit clock-in PIN code(s) in `src/shared-config.js`:
+  - `auth.pinCodes` (array of strings, e.g. `["1234", "5678"]`)
+  - `auth.rememberHours` (how long access stays valid on the device)
+
 ## Local Development
 Because this is a static site, open `src/index.html` in a browser, or run a simple local server:
 
