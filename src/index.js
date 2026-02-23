@@ -11,7 +11,6 @@ if (checkboxInputs.length === 0) {
     const workerNameError = document.querySelector('#workerNameError');
     const downloadCsvButton = document.querySelector('#downloadCsvButton');
     const archiveStatusText = document.querySelector('#archiveStatusText');
-    const saveWorkerNameButton = document.querySelector('#saveWorkerNameButton');
     const sessionIdText = document.querySelector('#sessionIdText');
     const syncStatusText = document.querySelector('#syncStatusText');
     const checklistType = window.location.pathname.includes('opening') ? 'opening' : 'closing';
@@ -694,20 +693,6 @@ if (checkboxInputs.length === 0) {
             });
         }
 
-        if (saveWorkerNameButton) {
-            saveWorkerNameButton.addEventListener('click', () => {
-                const enteredName = getWorkerName();
-
-                if (!validateWorkerName(enteredName, { showError: true })) {
-                    if (workerNameInput) {
-                        workerNameInput.focus();
-                    }
-                    return;
-                }
-
-                setWorkerName(enteredName);
-            });
-        }
     }
 
     function wireCsvControls() {
