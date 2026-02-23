@@ -99,6 +99,32 @@ p {
     appearance: none;
 }
 
+.quick-back-btn {
+    position: fixed;
+    top: calc(env(safe-area-inset-top, 0px) + 0.75rem);
+    left: calc(env(safe-area-inset-left, 0px) + 0.75rem);
+    z-index: 125;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 2.1rem;
+    padding: 0.45rem 0.7rem;
+    border: 1px solid rgba(76, 76, 76, 0.35);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.9);
+    color: var(--mosa-green);
+    font-size: 0.82rem;
+    font-weight: 700;
+    line-height: 1;
+    text-decoration: none;
+    backdrop-filter: blur(2px);
+}
+
+.quick-back-btn:hover {
+    background: rgba(255, 255, 255, 1);
+    border-color: rgba(76, 76, 76, 0.45);
+}
+
 .page-menu {
     position: fixed;
     top: calc(env(safe-area-inset-top, 0px) + 0.75rem);
