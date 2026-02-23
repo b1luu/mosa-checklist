@@ -395,6 +395,10 @@
         const config = getConfig();
         if (!config.enabled) {
             wireMenuControls();
+            const workerName = loadWorkerName();
+            if (isValidWorkerName(workerName)) {
+                renderSignedInName(workerName);
+            }
             return true;
         }
 

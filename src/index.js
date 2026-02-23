@@ -121,6 +121,8 @@ if (checkboxInputs.length === 0) {
 
     const sharedConfig = window.MOSA_SHARED_CONFIG || {};
     const firebaseConfig = sharedConfig.firebase || {};
+    const authConfig = sharedConfig.auth || {};
+    const isAuthEnabled = authConfig.enabled !== false;
 
     let workerName = (localStorage.getItem(WORKER_NAME_KEY) || '').trim();
     let activeChunk = defaultChunk;
@@ -575,6 +577,13 @@ if (checkboxInputs.length === 0) {
     }
 
     function requireWorkerName() {
+        if (!isAuthEnabled) {
+            if (!workerName) {
+                setWorkerName('Local Worker');
+            }
+            return getWorkerName();
+        }
+
         const currentName = getWorkerName();
         const validationMessage = getWorkerNameValidationMessage(currentName);
         if (!validationMessage) {
@@ -640,6 +649,15 @@ if (checkboxInputs.length === 0) {
     }
 
     function wireWorkerControls() {
+        if (!isAuthEnabled) {
+            if (!workerName) {
+                setWorkerName('Local Worker');
+            } else {
+                setWorkerName(workerName);
+            }
+            return true;
+        }
+
         const validationMessage = getWorkerNameValidationMessage(workerName);
         if (validationMessage) {
             redirectToLogin();
