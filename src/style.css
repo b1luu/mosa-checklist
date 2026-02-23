@@ -34,6 +34,7 @@ body {
     border: 1px solid var(--mosa-border);
     border-radius: 12px;
     box-shadow: var(--mosa-shadow);
+    position: relative;
 }
 
 h1 {
@@ -96,6 +97,56 @@ p {
 .logout-btn {
     cursor: pointer;
     appearance: none;
+}
+
+.page-menu {
+    position: absolute;
+    top: 0.65rem;
+    right: 0.65rem;
+    z-index: 30;
+}
+
+.menu-trigger {
+    width: 2rem;
+    height: 2rem;
+    border: 1px solid rgba(76, 76, 76, 0.35);
+    background: rgba(255, 255, 255, 0.72);
+    color: var(--mosa-green);
+    font-size: 1.1rem;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.menu-dropdown {
+    margin-top: 0.35rem;
+    min-width: 11.5rem;
+    border: 1px solid rgba(76, 76, 76, 0.25);
+    background: rgba(255, 255, 255, 0.96);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.12);
+    display: grid;
+    gap: 0;
+    overflow: hidden;
+}
+
+.menu-item {
+    border: 0;
+    border-bottom: 1px solid rgba(76, 76, 76, 0.16);
+    background: transparent;
+    color: var(--mosa-text);
+    text-align: left;
+    font: inherit;
+    font-size: 0.9rem;
+    font-weight: 600;
+    padding: 0.6rem 0.7rem;
+    cursor: pointer;
+}
+
+.menu-item:last-child {
+    border-bottom: 0;
+}
+
+.menu-item:hover {
+    background: rgba(100, 106, 75, 0.08);
 }
 
 .auth-form {

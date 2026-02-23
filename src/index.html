@@ -8,6 +8,22 @@
 </head>
 <body>
     <main class="container">
+        <div class="page-menu" data-menu-root>
+            <button
+                type="button"
+                class="menu-trigger"
+                data-menu-trigger
+                aria-label="Open menu"
+                aria-expanded="false"
+            >
+                ⚙
+            </button>
+            <div class="menu-dropdown" data-menu-panel hidden>
+                <button type="button" class="menu-item" data-menu-download>Download Master CSV</button>
+                <button type="button" class="menu-item" data-logout-btn>Log Out</button>
+            </div>
+        </div>
+
         <h1>Mosa Tea Checklist</h1>
         <p>Virtual Opening and Closing Checklist</p>
         <p>Select one to continue.</p>
@@ -15,7 +31,6 @@
         <div class="mode-buttons">
             <a class="mode-btn" href="opening.html">Opening</a>
             <a class="mode-btn" href="closing.html">Closing</a>
-            <button type="button" class="mode-btn logout-btn" data-logout-btn>Log Out</button>
         </div>
     </main>
     <script src="shared-config.js"></script>

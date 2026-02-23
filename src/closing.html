@@ -8,6 +8,22 @@
 </head>
 <body>
     <main class="container checklist-page">
+        <div class="page-menu" data-menu-root>
+            <button
+                type="button"
+                class="menu-trigger"
+                data-menu-trigger
+                aria-label="Open menu"
+                aria-expanded="false"
+            >
+                ⚙
+            </button>
+            <div class="menu-dropdown" data-menu-panel hidden>
+                <button type="button" class="menu-item" data-menu-download>Download Master CSV</button>
+                <button type="button" class="menu-item" data-logout-btn>Log Out</button>
+            </div>
+        </div>
+
         <h1>Closing Checklist</h1>
         <p>Complete every task before locking up.</p>
         <section class="sync-panel" aria-label="Shared checklist controls">
@@ -17,10 +33,6 @@
                 <button id="saveWorkerNameButton" class="sync-save-btn" type="button">Save</button>
             </div>
             <p id="workerNameError" class="sync-error" role="alert" aria-live="polite"></p>
-            <div class="sync-row">
-                <button id="downloadCsvButton" class="sync-export-btn" type="button">Download Master CSV</button>
-            </div>
-            <p class="sync-line" id="archiveStatusText">Master CSV: will update when checklist changes</p>
             <p class="sync-line">Session: <strong id="sessionIdText"></strong></p>
             <p class="sync-line" id="syncStatusText">Mode: Local only</p>
         </section>
@@ -211,7 +223,6 @@
 
         <div class="mode-buttons">
             <a class="back-link" href="index.html">Back to Home</a>
-            <button type="button" class="back-link logout-btn" data-logout-btn>Log Out</button>
         </div>
     </main>
     <script src="shared-config.js"></script>
