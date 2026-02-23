@@ -823,9 +823,7 @@ if (checkboxInputs.length === 0) {
         sessionIdText.textContent = sessionId;
     }
 
-    if (!wireWorkerControls()) {
-        return;
-    }
+    wireWorkerControls();
     wireCsvControls();
     wireCheckboxControls();
     wireChunkControls();

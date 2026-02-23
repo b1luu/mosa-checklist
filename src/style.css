@@ -108,6 +108,7 @@ p {
     display: flex;
     justify-content: flex-end;
     align-items: flex-start;
+    pointer-events: none;
 }
 
 .menu-trigger {
@@ -120,6 +121,7 @@ p {
     line-height: 1;
     border-radius: 999px;
     cursor: pointer;
+    pointer-events: auto;
 }
 
 .menu-trigger.is-initials {
@@ -153,6 +155,12 @@ p {
     visibility: visible;
     pointer-events: auto;
     transform: translateY(0);
+}
+
+.page-menu:hover,
+.page-menu:focus-within,
+.page-menu.is-open {
+    pointer-events: auto;
 }
 
 .menu-item {
