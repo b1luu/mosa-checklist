@@ -7,8 +7,7 @@ if (checkboxInputs.length === 0) {
     const chunkTabs = Array.from(document.querySelectorAll('.chunk-tab'));
     const completeChunkButton = document.querySelector('[data-chunk-action="complete-next"]');
     const chunkStatus = document.querySelector('.chunk-status');
-    const workerNameInput = document.querySelector('#workerNameInput');
-    const workerNameError = document.querySelector('#workerNameError');
+    const signedInNameText = document.querySelector('#signedInNameText');
     const downloadCsvButton = document.querySelector('#downloadCsvButton');
     const archiveStatusText = document.querySelector('#archiveStatusText');
     const sessionIdText = document.querySelector('#sessionIdText');
@@ -116,6 +115,7 @@ if (checkboxInputs.length === 0) {
     const WORKER_NAME_KEY = 'mosa:workerName';
     const STATE_STORAGE_KEY = `mosa:${window.location.pathname}:state:${sessionId}`;
     const WORKER_NAME_PATTERN = /^[a-zA-Z0-9][a-zA-Z0-9 .'-]*$/;
+    const REDIRECT_PARAM = 'redirect';
     const MASTER_ROWS_STORAGE_KEY = `mosa:${window.location.pathname}:master-rows`;
     const MASTER_ROWS_UPDATED_AT_KEY = `mosa:${window.location.pathname}:master-updated-at`;
 
@@ -138,6 +138,34 @@ if (checkboxInputs.length === 0) {
         if (archiveStatusText) {
             archiveStatusText.textContent = message;
         }
+    }
+
+    function getWorkerNameValidationMessage(rawValue) {
+        const name = String(rawValue || '').trim();
+
+        if (!name) {
+            return 'Enter your name.';
+        }
+
+        if (name.length < 2) {
+            return 'Name must be at least 2 characters.';
+        }
+
+        if (!WORKER_NAME_PATTERN.test(name)) {
+            return 'Use letters, numbers, spaces, apostrophes, periods, or hyphens.';
+        }
+
+        return '';
+    }
+
+    function getLoginRedirectUrl() {
+        const currentPathWithSearch = `${window.location.pathname.split('/').pop()}${window.location.search}`;
+        const redirectParam = encodeURIComponent(currentPathWithSearch || 'index.html');
+        return `login.html?${REDIRECT_PARAM}=${redirectParam}`;
+    }
+
+    function redirectToLogin() {
+        window.location.replace(getLoginRedirectUrl());
     }
 
     function escapeCsvValue(rawValue) {
@@ -346,38 +374,6 @@ if (checkboxInputs.length === 0) {
         downloadMasterCsvFromRows(loadLocalMasterRows(), 'local');
     }
 
-    function setWorkerNameError(message = '') {
-        if (workerNameInput) {
-            const hasError = Boolean(message);
-            workerNameInput.classList.toggle('is-invalid', hasError);
-            workerNameInput.setAttribute('aria-invalid', hasError ? 'true' : 'false');
-        }
-
-        if (workerNameError) {
-            workerNameError.textContent = message;
-            workerNameError.classList.toggle('is-visible', Boolean(message));
-        }
-    }
-
-    function validateWorkerName(rawValue, { showError = false } = {}) {
-        const name = rawValue.trim();
-        let message = '';
-
-        if (!name) {
-            message = 'Enter your name before checking tasks.';
-        } else if (name.length < 2) {
-            message = 'Name must be at least 2 characters.';
-        } else if (!WORKER_NAME_PATTERN.test(name)) {
-            message = 'Use letters, numbers, spaces, apostrophes, periods, or hyphens.';
-        }
-
-        if (showError) {
-            setWorkerNameError(message);
-        }
-
-        return !message;
-    }
-
     function createDefaultState() {
         const items = {};
 
@@ -561,41 +557,32 @@ if (checkboxInputs.length === 0) {
     }
 
     function getWorkerName() {
-        if (workerNameInput) {
-            return workerNameInput.value.trim();
-        }
-
         return workerName;
     }
 
     function setWorkerName(nextName) {
         workerName = nextName.trim();
 
-        if (workerNameInput) {
-            workerNameInput.value = workerName;
-        }
-
-        setWorkerNameError('');
-
         if (workerName) {
             localStorage.setItem(WORKER_NAME_KEY, workerName);
         } else {
             localStorage.removeItem(WORKER_NAME_KEY);
         }
+
+        if (signedInNameText) {
+            signedInNameText.textContent = workerName || 'Unknown';
+        }
     }
 
     function requireWorkerName() {
         const currentName = getWorkerName();
-
-        if (validateWorkerName(currentName, { showError: true })) {
+        const validationMessage = getWorkerNameValidationMessage(currentName);
+        if (!validationMessage) {
             setWorkerName(currentName);
             return currentName.trim();
         }
 
-        if (workerNameInput) {
-            workerNameInput.focus();
-        }
-
+        redirectToLogin();
         return null;
     }
 
@@ -653,46 +640,14 @@ if (checkboxInputs.length === 0) {
     }
 
     function wireWorkerControls() {
-        if (workerNameInput) {
-            workerNameInput.value = workerName;
-            workerNameInput.addEventListener('input', () => {
-                const enteredName = getWorkerName();
-
-                if (!enteredName) {
-                    workerName = '';
-                    localStorage.removeItem(WORKER_NAME_KEY);
-
-                    if (workerNameInput.classList.contains('is-invalid')) {
-                        setWorkerNameError('Enter your name before checking tasks.');
-                    }
-                    return;
-                }
-
-                if (validateWorkerName(enteredName)) {
-                    setWorkerName(enteredName);
-                    return;
-                }
-
-                if (workerNameInput.classList.contains('is-invalid')) {
-                    validateWorkerName(workerNameInput.value, { showError: true });
-                }
-            });
-            workerNameInput.addEventListener('blur', () => {
-                const enteredName = getWorkerName();
-
-                if (!enteredName) {
-                    setWorkerNameError('Enter your name before checking tasks.');
-                    return;
-                }
-
-                if (!validateWorkerName(enteredName, { showError: true })) {
-                    return;
-                }
-
-                setWorkerName(enteredName);
-            });
+        const validationMessage = getWorkerNameValidationMessage(workerName);
+        if (validationMessage) {
+            redirectToLogin();
+            return false;
         }
 
+        setWorkerName(workerName);
+        return true;
     }
 
     function wireCsvControls() {
@@ -855,7 +810,9 @@ if (checkboxInputs.length === 0) {
         sessionIdText.textContent = sessionId;
     }
 
-    wireWorkerControls();
+    if (!wireWorkerControls()) {
+        return;
+    }
     wireCsvControls();
     wireCheckboxControls();
     wireChunkControls();
