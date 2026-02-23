@@ -7,7 +7,6 @@ if (checkboxInputs.length === 0) {
     const chunkTabs = Array.from(document.querySelectorAll('.chunk-tab'));
     const completeChunkButton = document.querySelector('[data-chunk-action="complete-next"]');
     const chunkStatus = document.querySelector('.chunk-status');
-    const signedInNameText = document.querySelector('#signedInNameText');
     const downloadCsvButton = document.querySelector('#downloadCsvButton');
     const archiveStatusText = document.querySelector('#archiveStatusText');
     const sessionIdText = document.querySelector('#sessionIdText');
@@ -569,10 +568,6 @@ if (checkboxInputs.length === 0) {
             localStorage.setItem(WORKER_NAME_KEY, workerName);
         } else {
             localStorage.removeItem(WORKER_NAME_KEY);
-        }
-
-        if (signedInNameText) {
-            signedInNameText.textContent = workerName || 'Unknown';
         }
     }
 

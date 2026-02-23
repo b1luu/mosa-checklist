@@ -38,7 +38,7 @@ Goal: workers on opening or closing see the same checklist state and who checked
 How it works:
 - Sign in once on `login.html` with your 4-digit PIN.
 - Each PIN maps to a worker name in config.
-- Opening/closing pages display `Signed in as: [name]`.
+- Opening/closing pages show worker initials in the top-right menu button (for example, `BL`).
 - Use the same URL/session for both workers:
   - Example: `opening.html?session=2026-02-21`
   - Example: `closing.html?session=2026-02-21`

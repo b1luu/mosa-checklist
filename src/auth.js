@@ -163,13 +163,38 @@
         window.location.replace(`login.html?${REDIRECT_PARAM}=${redirectParam}`);
     }
 
-    function renderSignedInName(name) {
-        const signedInNameElement = document.querySelector("#signedInNameText");
-        if (!signedInNameElement) {
-            return;
+    function getWorkerInitials(name) {
+        const normalizedName = String(name || "").trim();
+        if (!normalizedName) {
+            return "";
         }
 
-        signedInNameElement.textContent = String(name || "").trim();
+        const nameParts = normalizedName.split(/[^a-zA-Z0-9]+/).filter(Boolean);
+        if (nameParts.length === 0) {
+            return "";
+        }
+
+        if (nameParts.length === 1) {
+            return nameParts[0].slice(0, 2).toUpperCase();
+        }
+
+        return `${nameParts[0][0]}${nameParts[nameParts.length - 1][0]}`.toUpperCase();
+    }
+
+    function renderMenuTriggerIdentity(name) {
+        const normalizedName = String(name || "").trim();
+        const initials = getWorkerInitials(normalizedName);
+        const triggerLabel = initials || "⚙";
+        const triggers = Array.from(document.querySelectorAll("[data-menu-trigger]"));
+
+        triggers.forEach((trigger) => {
+            trigger.textContent = triggerLabel;
+            trigger.classList.toggle("is-initials", Boolean(initials));
+            trigger.setAttribute(
+                "aria-label",
+                initials ? `Open menu for ${normalizedName}` : "Open menu"
+            );
+        });
     }
 
     function escapeCsvValue(rawValue) {
@@ -397,7 +422,9 @@
             wireMenuControls();
             const workerName = loadWorkerName();
             if (isValidWorkerName(workerName)) {
-                renderSignedInName(workerName);
+                renderMenuTriggerIdentity(workerName);
+            } else {
+                renderMenuTriggerIdentity("");
             }
             return true;
         }
@@ -411,7 +438,7 @@
             }
 
             wireMenuControls();
-            renderSignedInName(workerName);
+            renderMenuTriggerIdentity(workerName);
             return true;
         }
 
