@@ -100,25 +100,28 @@ p {
 }
 
 .page-menu {
-    position: absolute;
-    top: 0.65rem;
-    right: 0.65rem;
-    z-index: 30;
+    position: fixed;
+    top: calc(env(safe-area-inset-top, 0px) + 0.75rem);
+    right: calc(env(safe-area-inset-right, 0px) + 0.75rem);
+    z-index: 120;
 }
 
 .menu-trigger {
-    width: 2rem;
-    height: 2rem;
+    width: 2.1rem;
+    height: 2.1rem;
     border: 1px solid rgba(76, 76, 76, 0.35);
-    background: rgba(255, 255, 255, 0.72);
+    background: rgba(255, 255, 255, 0.88);
     color: var(--mosa-green);
-    font-size: 1.1rem;
+    font-size: 1.05rem;
     line-height: 1;
+    border-radius: 999px;
     cursor: pointer;
 }
 
 .menu-dropdown {
-    margin-top: 0.35rem;
+    position: absolute;
+    top: calc(100% + 0.35rem);
+    right: 0;
     min-width: 11.5rem;
     border: 1px solid rgba(76, 76, 76, 0.25);
     background: rgba(255, 255, 255, 0.96);
@@ -126,6 +129,20 @@ p {
     display: grid;
     gap: 0;
     overflow: hidden;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transform: translateY(-4px);
+    transition: opacity 0.16s ease, transform 0.16s ease, visibility 0.16s ease;
+}
+
+.page-menu:hover .menu-dropdown,
+.page-menu:focus-within .menu-dropdown,
+.page-menu.is-open .menu-dropdown {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transform: translateY(0);
 }
 
 .menu-item {
@@ -146,7 +163,8 @@ p {
 }
 
 .menu-item:hover {
-    background: rgba(100, 106, 75, 0.08);
+    background: rgba(100, 106, 75, 0.18);
+    color: #1f2616;
 }
 
 .auth-form {
