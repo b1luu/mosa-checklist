@@ -657,6 +657,23 @@ if (checkboxInputs.length === 0) {
         if (workerNameInput) {
             workerNameInput.value = workerName;
             workerNameInput.addEventListener('input', () => {
+                const enteredName = getWorkerName();
+
+                if (!enteredName) {
+                    workerName = '';
+                    localStorage.removeItem(WORKER_NAME_KEY);
+
+                    if (workerNameInput.classList.contains('is-invalid')) {
+                        setWorkerNameError('Enter your name before checking tasks.');
+                    }
+                    return;
+                }
+
+                if (validateWorkerName(enteredName)) {
+                    setWorkerName(enteredName);
+                    return;
+                }
+
                 if (workerNameInput.classList.contains('is-invalid')) {
                     validateWorkerName(workerNameInput.value, { showError: true });
                 }
@@ -669,7 +686,11 @@ if (checkboxInputs.length === 0) {
                     return;
                 }
 
-                validateWorkerName(enteredName, { showError: true });
+                if (!validateWorkerName(enteredName, { showError: true })) {
+                    return;
+                }
+
+                setWorkerName(enteredName);
             });
         }
 
