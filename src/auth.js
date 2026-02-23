@@ -250,17 +250,17 @@
         downloadMasterCsvFallback();
     }
 
-    function closeMenu(menuRoot) {
+    function setMenuOpen(menuRoot, shouldOpen) {
         const trigger = menuRoot.querySelector("[data-menu-trigger]");
-        const panel = menuRoot.querySelector("[data-menu-panel]");
-
-        if (panel) {
-            panel.hidden = true;
-        }
+        menuRoot.classList.toggle("is-open", shouldOpen);
 
         if (trigger) {
-            trigger.setAttribute("aria-expanded", "false");
+            trigger.setAttribute("aria-expanded", shouldOpen ? "true" : "false");
         }
+    }
+
+    function closeMenu(menuRoot) {
+        setMenuOpen(menuRoot, false);
     }
 
     function closeAllMenus() {
@@ -277,17 +277,17 @@
             const downloadButton = menuRoot.querySelector("[data-menu-download]");
             const logoutButton = menuRoot.querySelector("[data-logout-btn]");
 
-            if (trigger && panel) {
+            if (trigger) {
                 trigger.addEventListener("click", (event) => {
                     event.stopPropagation();
-                    const shouldOpen = panel.hidden;
+                    const shouldOpen = !menuRoot.classList.contains("is-open");
 
                     closeAllMenus();
-
-                    panel.hidden = !shouldOpen;
-                    trigger.setAttribute("aria-expanded", shouldOpen ? "true" : "false");
+                    setMenuOpen(menuRoot, shouldOpen);
                 });
+            }
 
+            if (panel) {
                 panel.addEventListener("click", (event) => {
                     event.stopPropagation();
                 });
