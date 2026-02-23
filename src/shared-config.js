@@ -12,7 +12,7 @@ window.MOSA_SHARED_CONFIG = {
         //     "5678": "Jamie"
         // }
         pinUsers: {
-            "0000": "Mosa Worker"
+            "0504": "Brandon L."
         },
         // How long PIN access remains valid in this browser.
         rememberHours: 12
