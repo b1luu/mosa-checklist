@@ -72,7 +72,7 @@ p {
     min-width: 170px;
     padding: 0.82rem 1.35rem;
     border: 1px solid var(--mosa-green);
-    border-radius: 0;
+    border-radius: 999px;
     background: var(--mosa-green);
     color: var(--mosa-white);
     font-family: var(--font-main);
